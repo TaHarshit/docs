@@ -1,0 +1,87 @@
+---
+title: "POST /user/feedback — Submit User Feedback"
+sidebarTitle: "Feedback"
+description: "POST /user/feedback — Submit a feedback message and optional rating. Feedback is linked to your authenticated account and sent directly to the FSS team."
+---
+
+Use this endpoint to submit feedback about the FSS Measurement application. You can include a written message and an optional numeric rating. Submitted feedback is associated with your authenticated account and sent directly to the FSS team.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/user/feedback
+```
+
+## Required headers
+
+| Header          | Value                 |
+| --------------- | --------------------- |
+| `platform`      | `WEB`                 |
+| `api-key`       | `FSS2023`             |
+| `Authorization` | `Bearer {your_token}` |
+| `Content-Type`  | `application/json`    |
+
+## Request body parameters
+
+<ParamField body="feedback" type="string" required>
+  The feedback message or support note you want to submit.
+</ParamField>
+
+<ParamField body="rating" type="integer">
+  A numeric rating from `1` (lowest) to `5` (highest).
+</ParamField>
+
+## Response fields
+
+<ResponseField name="status" type="string">
+  `"success"` when the feedback is recorded successfully.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  The result of the submission.
+
+  <Expandable title="data properties">
+    <ResponseField name="message" type="string">
+      A human-readable confirmation, e.g. `"Feedback submitted successfully"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://fssportal.com/api/v1/user/feedback \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "feedback": "The measurement export feature is very helpful.",
+    "rating": 5
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "success",
+  "data": {
+    "message": "Feedback submitted successfully"
+  }
+}
+```
+
+```json 422
+{
+  "status": "error",
+  "message": "Validation failed"
+}
+```
+
+</ResponseExample>

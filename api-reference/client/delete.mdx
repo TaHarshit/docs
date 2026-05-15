@@ -1,0 +1,88 @@
+---
+title: "POST /client/delete — Delete a Client Record"
+sidebarTitle: "Delete Client"
+description: "POST /client/delete — Permanently remove a client record by ID. All data associated with the client is deleted and cannot be recovered through the API."
+---
+
+Use this endpoint to permanently remove a client record from your FSS account. You provide the `client_id` of the record to delete. There is no soft-delete or archive — once the request succeeds, the client and any directly associated data are permanently removed from your account.
+
+<Warning>
+  Deleting a client is permanent and cannot be undone. Ensure you have retrieved or exported any data you need before making this request.
+</Warning>
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/client/delete
+```
+
+## Required headers
+
+| Header | Value |
+|---|---|
+| `platform` | `WEB` |
+| `api-key` | `FSS2023` |
+| `Authorization` | `Bearer {your_token}` |
+| `Content-Type` | `application/json` |
+
+## Request body
+
+<ParamField body="client_id" type="integer" required>
+  The unique ID of the client record to delete. You can retrieve this from `GET /client/list`.
+</ParamField>
+
+## Response fields
+
+<ResponseField name="message" type="string">
+  A confirmation message indicating the result of the operation.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An empty array returned on successful deletion.
+</ResponseField>
+
+## Example request
+
+```bash
+curl --request POST \
+  --url https://fssportal.com/api/v1/client/delete \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "client_id": 1164
+  }'
+```
+
+## Success response
+
+```json
+{
+  "message": "Client deleted successfully.",
+  "data": []
+}
+```
+
+## Error responses
+
+```json 422 Validation error
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "client_id": ["The client id field is required."]
+  }
+}
+```
+
+```json 404 Not found
+{
+  "message": "Client not found."
+}
+```
+
+```json 401 Unauthorized
+{
+  "message": "Unauthenticated."
+}
+```

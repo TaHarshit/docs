@@ -1,0 +1,201 @@
+---
+title: "POST /client/search — Search Clients by Keyword"
+sidebarTitle: "Search Clients"
+description: "POST /client/search — Search clients by name, email, or phone keyword. Returns matching client records for the authenticated user."
+---
+
+Use this endpoint to search for client records using a free-text keyword. The API matches the keyword against client names, email addresses, phone numbers, and other identifying fields and returns all matching records. Use this endpoint to quickly locate a specific client without fetching the full paginated list.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/client/search
+```
+
+## Required headers
+
+| Header | Value |
+|---|---|
+| `platform` | `WEB` |
+| `api-key` | `FSS2023` |
+| `Authorization` | `Bearer {your_token}` |
+| `Content-Type` | `application/json` |
+
+## Request body
+
+<ParamField body="keyword" type="string">
+  The search term to match against client records. Matches against name, email, phone number, and related fields.
+</ParamField>
+
+## Response fields
+
+<ResponseField name="message" type="string">
+  A status message for the request.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  The paginated response envelope containing matching client records.
+  <Expandable title="properties">
+    <ResponseField name="current_page" type="integer">
+      The current page number in the result set.
+    </ResponseField>
+    <ResponseField name="per_page" type="integer">
+      The number of records returned per page.
+    </ResponseField>
+    <ResponseField name="total" type="integer">
+      The total number of matching client records.
+    </ResponseField>
+    <ResponseField name="last_page" type="integer">
+      The number of the final page.
+    </ResponseField>
+    <ResponseField name="from" type="integer">
+      The 1-based index of the first record on the current page.
+    </ResponseField>
+    <ResponseField name="to" type="integer">
+      The 1-based index of the last record on the current page.
+    </ResponseField>
+    <ResponseField name="next_page_url" type="string">
+      The URL for the next page of results. `null` when on the last page.
+    </ResponseField>
+    <ResponseField name="prev_page_url" type="string">
+      The URL for the previous page of results. `null` when on the first page.
+    </ResponseField>
+    <ResponseField name="data" type="array">
+      The array of matching client records.
+      <Expandable title="client object">
+        <ResponseField name="id" type="integer">
+          The unique ID of the client record.
+        </ResponseField>
+        <ResponseField name="user_id" type="integer">
+          The ID of the user who owns this client record.
+        </ResponseField>
+        <ResponseField name="name" type="string">
+          The client's first name.
+        </ResponseField>
+        <ResponseField name="surname" type="string">
+          The client's last name.
+        </ResponseField>
+        <ResponseField name="email" type="string">
+          The client's email address.
+        </ResponseField>
+        <ResponseField name="phone_no" type="string">
+          The client's phone number.
+        </ResponseField>
+        <ResponseField name="location" type="string">
+          The project site or location identifier.
+        </ResponseField>
+        <ResponseField name="address" type="string">
+          The service street address.
+        </ResponseField>
+        <ResponseField name="city" type="string">
+          The city for the service address.
+        </ResponseField>
+        <ResponseField name="state" type="string">
+          The state for the service address.
+        </ResponseField>
+        <ResponseField name="zip_code" type="string">
+          The ZIP code for the service address.
+        </ResponseField>
+        <ResponseField name="billing_address" type="string">
+          The billing street address.
+        </ResponseField>
+        <ResponseField name="billing_city" type="string">
+          The city for the billing address.
+        </ResponseField>
+        <ResponseField name="billing_state" type="string">
+          The state for the billing address.
+        </ResponseField>
+        <ResponseField name="billing_zip_code" type="string">
+          The ZIP code for the billing address.
+        </ResponseField>
+        <ResponseField name="lead_source_id" type="integer">
+          The ID of the associated lead source. `null` if not set.
+        </ResponseField>
+        <ResponseField name="lead_source_name" type="string">
+          The display name of the associated lead source. `null` if not set.
+        </ResponseField>
+        <ResponseField name="lead_source_email" type="string">
+          The email address of the associated lead source. `null` if not set.
+        </ResponseField>
+        <ResponseField name="quote_no" type="string">
+          The quote number associated with this client.
+        </ResponseField>
+        <ResponseField name="project_name" type="string">
+          The project name associated with this client.
+        </ResponseField>
+        <ResponseField name="end_client_known" type="integer">
+          `1` if the end client's identity is known, `0` if not.
+        </ResponseField>
+        <ResponseField name="created_at" type="string">
+          The ISO 8601 timestamp when the record was created.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example request
+
+```bash
+curl --request POST \
+  --url https://fssportal.com/api/v1/client/search \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "keyword": "john"
+  }'
+```
+
+## Success response
+
+```json
+{
+  "message": "Client get successfully.",
+  "data": {
+    "current_page": 1,
+    "per_page": 20,
+    "total": 1,
+    "last_page": 1,
+    "from": 1,
+    "to": 1,
+    "next_page_url": null,
+    "prev_page_url": null,
+    "data": [
+      {
+        "id": 1475,
+        "user_id": 68,
+        "lead_source_id": 75,
+        "end_client_known": 1,
+        "quote_no": "",
+        "project_name": null,
+        "name": "John",
+        "surname": "Doe",
+        "email": "john.doe@example.com",
+        "phone_no": "8460008773",
+        "location": "Rajkot",
+        "address": "123 Main St",
+        "state": "Gujarat",
+        "city": "Rajkot",
+        "zip_code": "360006",
+        "billing_address": "123 Main St",
+        "billing_city": "Rajkot",
+        "billing_state": "Gujarat",
+        "billing_zip_code": "360006",
+        "created_at": "2025-12-16T05:33:32.000000Z",
+        "lead_source_name": "Referral",
+        "lead_source_email": "referral@example.com"
+      }
+    ]
+  }
+}
+```
+
+## Error responses
+
+```json 401 Unauthorized
+{
+  "message": "Unauthenticated."
+}
+```

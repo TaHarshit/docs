@@ -1,0 +1,104 @@
+---
+title: "GET /countries/index — List Available Countries"
+sidebarTitle: "Countries"
+description: "GET /countries/index — Returns all supported countries with IDs and names. Use returned IDs for address fields in client records. No authentication required."
+---
+
+Use this endpoint to fetch the list of countries supported by FSS Measurement. The returned `id` and `name` values are used when populating address fields in client and lead source records. This is a public endpoint — no authentication is required, so you can call it before a user logs in, such as during registration or address entry flows.
+
+## Endpoint
+
+```
+GET https://fssportal.com/api/v1/countries/index
+```
+
+<Info>This endpoint does not require authentication. You do not need to include an `Authorization` header.</Info>
+
+## Request headers
+
+<ParamField header="platform" type="string" required>
+  Must be `WEB`.
+</ParamField>
+
+<ParamField header="api-key" type="string" required>
+  Your FSS API key. Use `FSS2023`.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`.
+</ParamField>
+
+## Request body
+
+No request body is required for this endpoint.
+
+## Response fields
+
+<ResponseField name="status" type="string">
+  `"success"` on a successful response, or `"error"` if the request could not be fulfilled.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An array of country objects.
+  <Expandable title="Country object">
+    <ResponseField name="id" type="integer">
+      Unique identifier for the country.
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      Full country name, e.g. `"United States"`.
+    </ResponseField>
+    <ResponseField name="code" type="string">
+      ISO 3166-1 alpha-2 country code, e.g. `"US"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Error message returned when `status` is `"error"`.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://fssportal.com/api/v1/countries/index \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "United States",
+      "code": "US"
+    },
+    {
+      "id": 2,
+      "name": "Canada",
+      "code": "CA"
+    },
+    {
+      "id": 3,
+      "name": "United Kingdom",
+      "code": "GB"
+    }
+  ]
+}
+```
+
+```json 200 (error)
+{
+  "status": "error",
+  "message": "Failed to fetch countries"
+}
+```
+
+</ResponseExample>

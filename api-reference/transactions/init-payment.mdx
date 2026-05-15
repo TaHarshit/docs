@@ -1,0 +1,109 @@
+---
+title: "POST /transactions/init-payment — Start Subscription"
+sidebarTitle: "Init Payment"
+description: "POST /transactions/init-payment — Initialize a Stripe payment session to subscribe to a plan. Returns a checkout URL or client secret."
+---
+
+Use this endpoint to start the Stripe payment flow for an FSS Measurement subscription. You provide the plan you want to subscribe to and your preferred payment method. The API creates a Stripe Payment Intent and returns a `client_secret` that you pass to the Stripe SDK or Elements to collect card details on the client side. After the customer completes payment, call [Complete Payment](/api-reference/transactions/complete-payment) to finalize the subscription.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/transactions/init-payment
+```
+
+<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+
+## Request headers
+
+<ParamField header="platform" type="string" required>
+  Must be `WEB`.
+</ParamField>
+
+<ParamField header="api-key" type="string" required>
+  Your FSS API key. Use `FSS2023`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from your login response. Format: `Bearer {your_token}`.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`.
+</ParamField>
+
+## Request body
+
+<ParamField body="plan_id" type="integer" required>
+  The ID of the subscription plan to purchase. Retrieve available plan IDs from [GET /plans](/api-reference/plans/index).
+</ParamField>
+
+<ParamField body="payment_method" type="string" required>
+  The payment method type. Use `"card"` for credit or debit card payments.
+</ParamField>
+
+## Response fields
+
+<ResponseField name="status" type="string">
+  `"success"` when the Payment Intent is created, or `"error"` if initialization failed.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Stripe payment intent data. Only present when `status` is `"success"`.
+  <Expandable title="Payment intent object">
+    <ResponseField name="payment_intent_id" type="string">
+      Stripe Payment Intent ID, prefixed with `pi_`. Pass this value to [Complete Payment](/api-reference/transactions/complete-payment) after the customer confirms their card details.
+    </ResponseField>
+    <ResponseField name="client_secret" type="string">
+      Stripe client secret for this Payment Intent. Pass this to the Stripe SDK on your frontend to render the payment form.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Error description returned when `status` is `"error"`.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://fssportal.com/api/v1/transactions/init-payment \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "plan_id": 1,
+    "payment_method": "card"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "success",
+  "data": {
+    "payment_intent_id": "pi_3PxK2aLkdIwHu7ix1ABCdEfG",
+    "client_secret": "pi_3PxK2aLkdIwHu7ix1ABCdEfG_secret_XYZ"
+  }
+}
+```
+
+```json 200 (error)
+{
+  "status": "error",
+  "message": "Payment initialization failed"
+}
+```
+
+```json 401
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

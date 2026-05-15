@@ -1,0 +1,96 @@
+---
+title: "GET /adminroom/index — List Admin Room Templates"
+sidebarTitle: "Room Templates"
+description: "GET /adminroom/index — Returns all admin-defined room name templates in your account. Use the returned IDs with POST /room/add to assign room types."
+---
+
+Use this endpoint to retrieve the list of room type templates defined by your account administrator. These templates provide standardized room names — such as "Primary Bedroom", "Kitchen", or "Garage" — that you can assign when adding rooms to a measurement project. Using consistent room names across your account makes reporting and comparison more reliable.
+
+## Endpoint
+
+```
+GET https://fssportal.com/api/v1/adminroom/index
+```
+
+<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+
+## Request headers
+
+<ParamField header="platform" type="string" required>
+  Must be `WEB`.
+</ParamField>
+
+<ParamField header="api-key" type="string" required>
+  Your FSS API key. Use `FSS2023`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from your login response. Format: `Bearer {your_token}`.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`.
+</ParamField>
+
+## Request body
+
+No request body is required for this endpoint.
+
+## Response fields
+
+<ResponseField name="message" type="string">
+  A human-readable status message, e.g. `"Room type get successfully."`.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An array of room template objects.
+  <Expandable title="Room template object">
+    <ResponseField name="id" type="integer">
+      Unique identifier for the room template. Use this value when assigning a room type to a new room.
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      Display name for the room template, e.g. `"Primary Bedroom"` or `"Kitchen"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://fssportal.com/api/v1/adminroom/index \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "message": "Room type get successfully.",
+  "data": [
+    { "id": 3,  "name": "Attic" },
+    { "id": 4,  "name": "Bathroom 1" },
+    { "id": 12, "name": "Bedroom 1" },
+    { "id": 13, "name": "Bedroom 2" },
+    { "id": 24, "name": "Family Room" },
+    { "id": 35, "name": "Kitchen" },
+    { "id": 36, "name": "Laundry Room" },
+    { "id": 52, "name": "Primary Bathroom" },
+    { "id": 53, "name": "Primary Bedroom" },
+    { "id": 54, "name": "Stairs" }
+  ]
+}
+```
+
+```json 401
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

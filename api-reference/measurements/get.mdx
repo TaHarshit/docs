@@ -1,0 +1,306 @@
+---
+title: "GET /measurements/get — Retrieve Measurements"
+sidebarTitle: "Get Measurements"
+description: "GET /measurements/get — Retrieve window measurements filtered by room or client ID. Returns an array of measurement objects with details."
+---
+
+Use this endpoint to retrieve existing measurements for a client. You can filter results by room, group, and measurement type. The response includes a `measurements` array where each object contains the full set of dimension fields recorded for that window — spanning standard, specialty, series, and awning types — with `null` returned for fields that are not applicable to a given record.
+
+<Note>
+  Although this endpoint is labelled `GET` in the API reference title, it accepts its filter parameters as a JSON body and must be called with the `POST` HTTP method.
+</Note>
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/measurements/get
+```
+
+## Required Headers
+
+| Header          | Value                  |
+| --------------- | ---------------------- |
+| `platform`      | `WEB`                  |
+| `api-key`       | `FSS2023`              |
+| `Authorization` | `Bearer {your_token}`  |
+| `Content-Type`  | `application/json`     |
+
+## Request Body
+
+<ParamField body="client_id" type="integer" required>
+  The ID of the client whose measurements you want to retrieve.
+</ParamField>
+
+<ParamField body="room_id" type="integer">
+  Filter results to a specific room. Omit to return measurements across all rooms for the client.
+</ParamField>
+
+<ParamField body="group_id" type="integer" required>
+  The ID of the measurement group. Required to scope results to the correct group.
+</ParamField>
+
+<ParamField body="measurement_type_id" type="integer" required>
+  Filter by measurement type (e.g. `1` = single window photo, `2` = specialty, `3` = series with draperies, `4` = awning).
+</ParamField>
+
+## Response
+
+<ResponseField name="message" type="string">
+  A human-readable confirmation, e.g. `"Measurement details get successfully!"`.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  The response data object.
+
+  <Expandable title="data fields">
+    <ResponseField name="measurements" type="array">
+      An array of measurement records matching your filter criteria.
+
+      <Expandable title="Measurement object fields">
+        <ResponseField name="id" type="integer">Unique ID of the measurement record.</ResponseField>
+        <ResponseField name="user_id" type="integer">ID of the user who recorded the measurement.</ResponseField>
+        <ResponseField name="client_id" type="integer">ID of the client this measurement belongs to.</ResponseField>
+        <ResponseField name="room_id" type="integer">ID of the room where the window is located.</ResponseField>
+        <ResponseField name="group_id" type="integer">ID of the measurement group.</ResponseField>
+        <ResponseField name="measurement_type_id" type="integer">Measurement type identifier.</ResponseField>
+        <ResponseField name="unit_type" type="integer">Unit system used: `0` = Imperial, `1` = Metric.</ResponseField>
+        <ResponseField name="mount_type" type="string">Mount style recorded for this measurement.</ResponseField>
+        <ResponseField name="window_type" type="object">Window shape type for specialty windows; `null` for standard windows.</ResponseField>
+        <ResponseField name="window_name" type="string">Descriptive label for the window.</ResponseField>
+        <ResponseField name="model" type="object">Product model associated with this measurement, if any.</ResponseField>
+        <ResponseField name="brand_name" type="object">Brand associated with this measurement, if any.</ResponseField>
+        <ResponseField name="refrance_image" type="object">Reference image attached to this measurement, if any.</ResponseField>
+        <ResponseField name="w_top" type="string">Width at the top of the opening (decimal string, e.g. `"36.000"`).</ResponseField>
+        <ResponseField name="w_middle" type="string">Width at the middle of the opening.</ResponseField>
+        <ResponseField name="w_bottom" type="string">Width at the bottom of the opening.</ResponseField>
+        <ResponseField name="h_left" type="string">Height on the left side of the opening.</ResponseField>
+        <ResponseField name="h_middle" type="string">Height at the centre of the opening.</ResponseField>
+        <ResponseField name="h_right" type="string">Height on the right side of the opening.</ResponseField>
+        <ResponseField name="d_sill" type="string">Sill depth.</ResponseField>
+        <ResponseField name="left_edge_w" type="string">Distance from the left frame edge to the nearest wall.</ResponseField>
+        <ResponseField name="right_edge_w" type="string">Distance from the right frame edge to the nearest wall.</ResponseField>
+        <ResponseField name="top_edge_to_ceiling_h" type="string">Distance from the top of the frame to the ceiling.</ResponseField>
+        <ResponseField name="bottom_edge_to_floor_h" type="string">Distance from the bottom of the frame to the floor.</ResponseField>
+        <ResponseField name="middle_a_w" type="string">Width at intermediate point A.</ResponseField>
+        <ResponseField name="middle_b_w" type="string">Width at intermediate point B.</ResponseField>
+        <ResponseField name="middle_c_w" type="string">Width at intermediate point C.</ResponseField>
+        <ResponseField name="wall_to_wall_w" type="string">Total wall-to-wall width.</ResponseField>
+        <ResponseField name="floor_to_ceiling_h" type="string">Total floor-to-ceiling height.</ResponseField>
+        <ResponseField name="bottom_trim_to_floor" type="string">Distance from the bottom trim to the floor.</ResponseField>
+        <ResponseField name="a" type="object">Specialty shape dimension A; `null` for non-specialty records.</ResponseField>
+        <ResponseField name="b" type="object">Specialty shape dimension B.</ResponseField>
+        <ResponseField name="c" type="object">Specialty shape dimension C.</ResponseField>
+        <ResponseField name="d" type="object">Specialty shape dimension D.</ResponseField>
+        <ResponseField name="e" type="object">Specialty shape dimension E.</ResponseField>
+        <ResponseField name="f" type="object">Specialty shape dimension F.</ResponseField>
+        <ResponseField name="g" type="object">Specialty shape dimension G.</ResponseField>
+        <ResponseField name="h" type="object">Specialty shape dimension H.</ResponseField>
+        <ResponseField name="i" type="object">Specialty shape dimension I.</ResponseField>
+        <ResponseField name="j" type="object">Specialty shape dimension J.</ResponseField>
+        <ResponseField name="k" type="object">Specialty shape dimension K.</ResponseField>
+        <ResponseField name="l" type="object">Specialty shape dimension L.</ResponseField>
+        <ResponseField name="w" type="object">Overall specialty window width.</ResponseField>
+        <ResponseField name="r" type="object">Radius for arched or circular shapes.</ResponseField>
+        <ResponseField name="w1" type="object">Secondary width for compound shapes.</ResponseField>
+        <ResponseField name="h1" type="object">Primary height for specialty shapes.</ResponseField>
+        <ResponseField name="d1" type="object">Primary depth for specialty shapes.</ResponseField>
+        <ResponseField name="x1" type="object">Horizontal offset, point 1.</ResponseField>
+        <ResponseField name="b1" type="object">Secondary base, point 1.</ResponseField>
+        <ResponseField name="w2" type="object">Tertiary width for compound shapes.</ResponseField>
+        <ResponseField name="h2" type="object">Secondary height for specialty shapes.</ResponseField>
+        <ResponseField name="d2" type="object">Secondary depth for specialty shapes.</ResponseField>
+        <ResponseField name="x2" type="object">Horizontal offset, point 2.</ResponseField>
+        <ResponseField name="b2" type="object">Secondary base, point 2.</ResponseField>
+        <ResponseField name="curtain_rod_length" type="object">Curtain rod length for series drapery records.</ResponseField>
+        <ResponseField name="curtain_rod_to_floor" type="object">Distance from curtain rod to floor.</ResponseField>
+        <ResponseField name="trim_width" type="object">Trim profile width for series records.</ResponseField>
+        <ResponseField name="number_in_series" type="object">Number of windows in a series.</ResponseField>
+        <ResponseField name="for_shutter" type="string">Whether this record is designated for a shutter product.</ResponseField>
+        <ResponseField name="square_feet" type="string">Square footage of the window or awning area.</ResponseField>
+        <ResponseField name="square_feet2" type="object">Square footage for series window B.</ResponseField>
+        <ResponseField name="square_feet3" type="object">Square footage for series window C.</ResponseField>
+        <ResponseField name="square_feet4" type="object">Square footage for series window D.</ResponseField>
+        <ResponseField name="square_feet5" type="object">Square footage for series window E.</ResponseField>
+        <ResponseField name="height" type="object">Awning height field; `null` for non-awning records.</ResponseField>
+        <ResponseField name="angle" type="object">Awning pitch angle.</ResponseField>
+        <ResponseField name="valance_height" type="object">Awning valance drop height.</ResponseField>
+        <ResponseField name="headroom" type="object">Awning overhead clearance.</ResponseField>
+        <ResponseField name="coverage_depth" type="object">Effective awning coverage depth.</ResponseField>
+        <ResponseField name="opening_clearance" type="object">Clearance needed for awning mechanism.</ResponseField>
+        <ResponseField name="width_cassette" type="object">Cassette housing width for retractable awnings.</ResponseField>
+        <ResponseField name="left_clearance" type="object">Left-side clearance for the awning.</ResponseField>
+        <ResponseField name="right_clearance" type="object">Right-side clearance for the awning.</ResponseField>
+        <ResponseField name="awning_config" type="object">Awning configuration or style.</ResponseField>
+        <ResponseField name="standoff_bracket" type="object">Standoff bracket specification.</ResponseField>
+        <ResponseField name="projection_lenth" type="object">Awning projection length when fully extended.</ResponseField>
+        <ResponseField name="bracket_data" type="object">Additional bracket specification data.</ResponseField>
+        <ResponseField name="focus_width" type="object">Solatech Focus width value.</ResponseField>
+        <ResponseField name="focus_height" type="object">Solatech Focus height value.</ResponseField>
+        <ResponseField name="focus_width_key" type="object">Solatech Focus width key identifier.</ResponseField>
+        <ResponseField name="focus_height_key" type="object">Solatech Focus height key identifier.</ResponseField>
+        <ResponseField name="offset_value" type="object">Offset adjustment applied to this record.</ResponseField>
+        <ResponseField name="offset_value_keys" type="object">Fields the offset applies to.</ResponseField>
+        <ResponseField name="measurement_unique_id" type="object">Solatech Focus unique identifier, if set.</ResponseField>
+        <ResponseField name="min_value_fields" type="object">Minimum value constraints map.</ResponseField>
+        <ResponseField name="custom_field" type="array">Array of custom field values recorded for this measurement.</ResponseField>
+        <ResponseField name="note" type="string">Free-text notes.</ResponseField>
+        <ResponseField name="installation_instructions" type="string">Installation instructions.</ResponseField>
+        <ResponseField name="status" type="integer">Record status: `1` = active, `0` = inactive.</ResponseField>
+        <ResponseField name="created_at" type="string">ISO 8601 timestamp when the record was created.</ResponseField>
+        <ResponseField name="created_by" type="integer">User ID of the record creator.</ResponseField>
+        <ResponseField name="updated_by" type="integer">User ID of the last user to update the record.</ResponseField>
+        <ResponseField name="images" type="array">Array of image objects attached to this measurement.</ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://fssportal.com/api/v1/measurements/get \
+  --header "platform: WEB" \
+  --header "api-key: FSS2023" \
+  --header "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  --header "Content-Type: application/json" \
+  --data '{
+    "client_id": 1856,
+    "room_id": 4945,
+    "group_id": 11157,
+    "measurement_type_id": 1
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200 Success
+{
+  "message": "Measurement details get successfully!",
+  "data": {
+    "measurements": [
+      {
+        "id": 12170,
+        "user_id": 68,
+        "client_id": 1856,
+        "room_id": 4945,
+        "group_id": 11157,
+        "measurement_type_id": 1,
+        "unit_type": 0,
+        "mount_type": "Inside",
+        "window_type": null,
+        "window_name": "Living Room Bay",
+        "model": null,
+        "brand_name": null,
+        "refrance_image": null,
+        "w_top": "36.000",
+        "w_middle": "35.750",
+        "w_bottom": "35.500",
+        "h_left": "48.000",
+        "h_middle": "48.000",
+        "h_right": "47.750",
+        "d_sill": "4.500",
+        "left_edge_w": "6.000",
+        "right_edge_w": "6.000",
+        "top_edge_to_ceiling_h": "12.000",
+        "bottom_edge_to_floor_h": "24.000",
+        "middle_a_w": "0.000",
+        "middle_b_w": "0.000",
+        "middle_c_w": "0.000",
+        "wall_to_wall_w": "48.000",
+        "floor_to_ceiling_h": "96.000",
+        "bottom_trim_to_floor": "22.500",
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "g": null,
+        "h": null,
+        "i": null,
+        "j": null,
+        "k": null,
+        "l": null,
+        "w": null,
+        "r": null,
+        "w1": null,
+        "h1": null,
+        "d1": null,
+        "x1": null,
+        "b1": null,
+        "w2": null,
+        "h2": null,
+        "d2": null,
+        "x2": null,
+        "b2": null,
+        "curtain_rod_length": null,
+        "curtain_rod_to_floor": null,
+        "trim_width": null,
+        "number_in_series": null,
+        "for_shutter": "",
+        "square_feet": "12.000",
+        "square_feet2": null,
+        "square_feet3": null,
+        "square_feet4": null,
+        "square_feet5": null,
+        "height": null,
+        "angle": null,
+        "valance_height": null,
+        "headroom": null,
+        "coverage_depth": null,
+        "opening_clearance": null,
+        "width_cassette": null,
+        "left_clearance": null,
+        "right_clearance": null,
+        "awning_config": null,
+        "standoff_bracket": null,
+        "projection_lenth": null,
+        "bracket_data": null,
+        "focus_width": null,
+        "focus_height": null,
+        "focus_width_key": null,
+        "focus_height_key": null,
+        "offset_value": null,
+        "offset_value_keys": null,
+        "measurement_unique_id": null,
+        "min_value_fields": {},
+        "custom_field": [],
+        "note": "South-facing, afternoon sun exposure",
+        "installation_instructions": "Inside mount, leave 1/8 inch clearance each side",
+        "status": 1,
+        "created_at": "2026-05-14T12:01:04.000000Z",
+        "created_by": 68,
+        "updated_by": 0,
+        "images": []
+      }
+    ]
+  }
+}
+```
+
+```json 422 Validation Error
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "client_id": ["The client id field is required."],
+    "group_id": ["The group id field is required."]
+  }
+}
+```
+
+```json 404 Not Found
+{
+  "message": "No measurements found for the given filters."
+}
+```
+
+```json 401 Unauthorized
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

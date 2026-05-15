@@ -1,0 +1,106 @@
+---
+title: "GET /user/get_company_user — List Team Members"
+sidebarTitle: "Company Users"
+description: "GET /user/get_company_user — Returns all team members in your company account, including their profile and role details. Useful for collaboration features."
+---
+
+Use this endpoint to retrieve all members of your company account. This is useful for team collaboration features such as assigning jobs, managing permissions, or displaying a list of colleagues within your FSS Measurement organization.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/user/get_company_user
+```
+
+<Note>
+  The source API uses `POST` for this endpoint. No request body is required.
+</Note>
+
+## Required headers
+
+| Header          | Value                 |
+| --------------- | --------------------- |
+| `platform`      | `WEB`                 |
+| `api-key`       | `FSS2023`             |
+| `Authorization` | `Bearer {your_token}` |
+| `Content-Type`  | `application/json`    |
+
+## Request body
+
+No request body is required for this endpoint.
+
+## Response fields
+
+<ResponseField name="message" type="string">
+  A human-readable status message, e.g. `"Success."`.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Array of user objects belonging to your company.
+
+  <Expandable title="data item properties">
+    <ResponseField name="id" type="integer">
+      Unique numeric identifier for the team member.
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      The team member's full name.
+    </ResponseField>
+    <ResponseField name="email" type="string">
+      The team member's email address.
+    </ResponseField>
+    <ResponseField name="phone_no" type="string | null">
+      The team member's phone number, or `null` if not set.
+    </ResponseField>
+    <ResponseField name="profile_image" type="string">
+      URL to the team member's profile image.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://fssportal.com/api/v1/user/get_company_user \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "message": "Success.",
+  "data": [
+    {
+      "id": 717,
+      "name": "Nathan Eldridge iPhone",
+      "phone_no": null,
+      "profile_image": "https://fssportal.com/uploads/profile_image/",
+      "email": "nathan@example.com"
+    },
+    {
+      "id": 718,
+      "name": "Nathan Eldridge iPad",
+      "phone_no": null,
+      "profile_image": "https://fssportal.com/uploads/profile_image/",
+      "email": "nathanipad@example.com"
+    },
+    {
+      "id": 719,
+      "name": "Kelly Eldridge iPhone",
+      "phone_no": null,
+      "profile_image": "https://fssportal.com/uploads/profile_image/",
+      "email": "kelly@example.com"
+    }
+  ]
+}
+```
+
+</ResponseExample>

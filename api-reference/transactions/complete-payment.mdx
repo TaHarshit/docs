@@ -1,0 +1,104 @@
+---
+title: "POST /transactions/complete-payment — Confirm Payment"
+sidebarTitle: "Complete Payment"
+description: "POST /transactions/complete-payment — Finalize a subscription purchase using a Stripe payment_intent_id. Returns the new subscription ID and active status."
+---
+
+Use this endpoint to finalize a subscription purchase after the customer has confirmed their payment details. You must first call [Init Payment](/api-reference/transactions/init-payment) to create a Stripe Payment Intent and obtain a `payment_intent_id`. Once Stripe confirms the card authorization on the client side, pass that `payment_intent_id` here to activate the subscription. On success, the API returns the new subscription ID and its active status.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/transactions/complete-payment
+```
+
+<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+
+## Request headers
+
+<ParamField header="platform" type="string" required>
+  Must be `WEB`.
+</ParamField>
+
+<ParamField header="api-key" type="string" required>
+  Your FSS API key. Use `FSS2023`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from your login response. Format: `Bearer {your_token}`.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`.
+</ParamField>
+
+## Request body
+
+<ParamField body="payment_intent_id" type="string" required>
+  The Stripe Payment Intent ID returned by [Init Payment](/api-reference/transactions/init-payment). Formatted as `pi_...`.
+</ParamField>
+
+## Response fields
+
+<ResponseField name="status" type="string">
+  `"success"` when the payment is confirmed and the subscription is activated, or `"error"` if the payment could not be completed.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Subscription activation details. Only present when `status` is `"success"`.
+  <Expandable title="Subscription object">
+    <ResponseField name="subscription_id" type="string">
+      Stripe subscription ID for the newly activated subscription, prefixed with `sub_`.
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Subscription status. `"active"` indicates the subscription is live and billing has begun.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Error description returned when `status` is `"error"`, e.g. `"Payment failed"`.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://fssportal.com/api/v1/transactions/complete-payment \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "payment_intent_id": "pi_3PxK2aLkdIwHu7ix1ABCdEfG"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "success",
+  "data": {
+    "subscription_id": "sub_1PxK3bLkdIwHu7ixABCdEfGH",
+    "status": "active"
+  }
+}
+```
+
+```json 200 (error)
+{
+  "status": "error",
+  "message": "Payment failed"
+}
+```
+
+```json 401
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

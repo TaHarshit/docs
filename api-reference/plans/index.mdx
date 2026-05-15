@@ -1,0 +1,114 @@
+---
+title: "GET /plans — List Available Subscription Plans"
+sidebarTitle: "Plans"
+description: "GET /plans — Returns all available FSS Measurement subscription plans. Each plan includes pricing, billing interval, and a list of included features."
+---
+
+Use this endpoint to retrieve the full catalog of FSS Measurement subscription plans. Each plan object includes pricing, billing interval, and a list of included features. Use the returned `id` values when calling [Init Payment](/api-reference/transactions/init-payment) to start a subscription checkout session.
+
+## Endpoint
+
+```
+GET https://fssportal.com/api/v1/plans
+```
+
+<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+
+## Request headers
+
+<ParamField header="platform" type="string" required>
+  Must be `WEB`.
+</ParamField>
+
+<ParamField header="api-key" type="string" required>
+  Your FSS API key. Use `FSS2023`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from your login response. Format: `Bearer {your_token}`.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`.
+</ParamField>
+
+## Request body
+
+No request body is required for this endpoint.
+
+## Response fields
+
+<ResponseField name="status" type="string">
+  `"success"` on a successful response, or `"error"` if the request could not be fulfilled.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An array of subscription plan objects.
+  <Expandable title="Plan object">
+    <ResponseField name="id" type="integer">
+      Unique identifier for the plan. Use this value as `plan_id` when initializing a payment.
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      Human-readable plan name, e.g. `"Basic"` or `"Pro"`.
+    </ResponseField>
+    <ResponseField name="price" type="number">
+      Plan price in USD.
+    </ResponseField>
+    <ResponseField name="interval" type="string">
+      Billing interval. Currently `"monthly"` or `"annual"`.
+    </ResponseField>
+    <ResponseField name="features" type="string[]">
+      List of features included with this plan.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Error message returned when `status` is `"error"`.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://fssportal.com/api/v1/plans \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "Basic",
+      "price": 29.99,
+      "interval": "monthly",
+      "features": ["Up to 50 measurements", "PDF exports", "Email support"]
+    },
+    {
+      "id": 2,
+      "name": "Pro",
+      "price": 49.99,
+      "interval": "monthly",
+      "features": ["Unlimited measurements", "PDF exports", "Priority support", "Team collaboration"]
+    }
+  ]
+}
+```
+
+```json 401
+{
+  "status": "error",
+  "message": "Unauthorized"
+}
+```
+
+</ResponseExample>

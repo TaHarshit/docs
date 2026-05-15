@@ -1,0 +1,198 @@
+---
+title: "Subscription Plans and API Access"
+description: "Learn how FSS Measurement API subscription plans control your API access, how to check your current plan status, and how to manage payments."
+---
+
+An active subscription is required to use most FSS Measurement API endpoints. Your API token is tied to your subscription status — the moment your subscription expires, requests to protected endpoints begin returning `403` errors until you renew. This page explains the plan types, what to expect when access lapses, and how to manage your subscription programmatically.
+
+## Plan types
+
+The FSS Measurement API supports three subscription states that grant access:
+
+<AccordionGroup>
+  <Accordion title="Stripe subscription">
+    A recurring subscription processed through Stripe. Renews automatically on your billing cycle. This is the most common plan type.
+  </Accordion>
+  <Accordion title="Trial period">
+    A time-limited trial that grants full API access without a payment method on file. When the trial period ends, you must activate a paid plan to continue using the API.
+  </Accordion>
+  <Accordion title="Cash subscription">
+    A manually activated subscription for accounts that pay outside of Stripe. Activated by your account manager.
+  </Accordion>
+</AccordionGroup>
+
+## What happens when your subscription expires
+
+When none of the three active states apply to your account, all protected endpoints return:
+
+```json
+{
+  "message": "Active subscription required to access this resource.",
+  "status": 403
+}
+```
+
+Your token itself remains valid — the `403` is not an authentication failure. Once you reactivate your subscription, the same token will work again without any changes to your integration.
+
+## Checking your current plan
+
+To inspect your current subscription status, call the plan endpoint:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/transactions/get_user_current_plan \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/transactions/get_user_current_plan', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+A successful response looks like:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "plan_id": 1,
+    "plan_name": "Basic",
+    "status": "active",
+    "renews_at": "2024-02-15"
+  }
+}
+```
+
+If there is no active subscription, the `status` field in the response data will reflect that.
+
+## Initiating a payment
+
+To start the payment process, call the init-payment endpoint with the plan you want to subscribe to:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/transactions/init-payment \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan_id": 1,
+    "payment_method": "card"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/transactions/init-payment', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    plan_id: 1,
+    payment_method: 'card'
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+The response returns a `payment_intent_id` and `client_secret` that you use to complete the transaction:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "payment_intent_id": "pi_123456",
+    "client_secret": "secret_here"
+  }
+}
+```
+
+## Completing a payment
+
+Once you have a `payment_intent_id` from the init-payment step, confirm the payment:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/transactions/complete-payment \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payment_intent_id": "pi_123456"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/transactions/complete-payment', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    payment_intent_id: 'pi_123456'
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+A successful response confirms the subscription is active:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "subscription_id": "sub_123456",
+    "status": "active"
+  }
+}
+```
+
+## Reactivating after expiry
+
+If your API requests start returning `403`, follow these steps to restore access:
+
+<Steps>
+  <Step title="Check your current plan status">
+    Call `POST /transactions/get_user_current_plan` to confirm the subscription has lapsed and identify which plan you need.
+  </Step>
+  <Step title="Initiate a new payment">
+    Call `POST /transactions/init-payment` with your chosen `plan_id` and `payment_method`. Save the `payment_intent_id` from the response.
+  </Step>
+  <Step title="Complete the payment">
+    Call `POST /transactions/complete-payment` with the `payment_intent_id`. Verify the response shows `"status": "active"`.
+  </Step>
+  <Step title="Retry your original request">
+    Your existing API token now works again. No token rotation or configuration changes are needed.
+  </Step>
+</Steps>
+
+<Warning>
+Do not discard your API token when you receive a `403`. The token is not invalidated by subscription expiry — only authentication failures (`401`) indicate a token problem.
+</Warning>
+
+## API reference
+
+- [`POST /transactions/get_user_current_plan`](/api-reference/transactions/get-user-current-plan) — Retrieve your current plan and status
+- [`POST /transactions/init-payment`](/api-reference/transactions/init-payment) — Initialize a subscription payment
+- [`POST /transactions/complete-payment`](/api-reference/transactions/complete-payment) — Confirm a payment and activate the subscription

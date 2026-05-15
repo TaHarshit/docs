@@ -1,0 +1,59 @@
+---
+title: "FSS Measurement API: Window Measurement Management"
+description: "FSS Measurement API helps field service professionals manage clients, rooms, and window measurements. Integrate via REST API with subscription-based access."
+---
+
+The FSS Measurement API gives field service professionals a complete backend for managing window measurement projects. With this API, you can create and organize clients, record multiple window measurement types, manage rooms within projects, track lead sources, and handle subscriptions — all through a consistent REST interface.
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Make your first API call in under 5 minutes
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Learn how to get a token and authenticate requests
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/overview">
+    Explore every endpoint with request and response examples
+  </Card>
+  <Card title="Guides" icon="book-open" href="/guides/manage-clients">
+    Step-by-step walkthroughs for common workflows
+  </Card>
+</CardGroup>
+
+## How it works
+
+<Steps>
+  <Step title="Create an account">
+    Sign up at [dashboard.fss-measurement.com](https://dashboard.fss-measurement.com) and activate a subscription plan.
+  </Step>
+  <Step title="Get your API token">
+    Sign in via the API to receive a Bearer token, then include it in the `Authorization` header on every protected request.
+  </Step>
+  <Step title="Add clients and rooms">
+    Create client records and organize them into rooms to prepare for measurement data entry.
+  </Step>
+  <Step title="Record measurements">
+    Submit window measurements for each room — single windows, multiple windows, specialty windows, awnings, and more.
+  </Step>
+</Steps>
+
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="Client Management" icon="users" href="/guides/manage-clients">
+    Add, search, and organize clients with lead source tracking and pagination.
+  </Card>
+  <Card title="Window Measurements" icon="ruler" href="/guides/record-measurements">
+    Record six measurement types including single, multiple, specialty, and awning windows.
+  </Card>
+  <Card title="Room Organization" icon="door-open" href="/guides/manage-rooms">
+    Group measurements by room within each client project.
+  </Card>
+  <Card title="Subscriptions" icon="credit-card" href="/concepts/subscriptions">
+    Stripe-powered plans with automatic access enforcement per token.
+  </Card>
+</CardGroup>
+
+<Note>
+  The API base URL is `https://fssportal.com/api/v1`. All endpoints require HTTPS in production. Rate limiting is enforced at 60 requests per minute per token.
+</Note>

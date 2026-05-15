@@ -1,0 +1,171 @@
+{
+  "projectType": "api-service",
+  "projectName": "FSS Measurement API",
+  "projectDescription": "A RESTful API for managing window measurements, clients, rooms, and subscriptions for field service professionals.",
+  "theme": "luma",
+  "primaryColor": "#0D9373",
+  "lightColor": "#07C983",
+  "darkColor": "#0D9373",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/data-model",
+              "concepts/subscriptions"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/manage-clients",
+              "guides/record-measurements",
+              "guides/manage-rooms"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/overview",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "Authentication",
+            "pages": [
+              "api-reference/user/signup",
+              "api-reference/user/signin",
+              "api-reference/user/forgot-password",
+              "api-reference/user/reset-password",
+              "api-reference/user/qrcode-signin"
+            ]
+          },
+          {
+            "group": "User",
+            "pages": [
+              "api-reference/user/get-profile",
+              "api-reference/user/update-profile",
+              "api-reference/user/get-company-user",
+              "api-reference/user/invite-user",
+              "api-reference/user/feedback",
+              "api-reference/user/delete-account"
+            ]
+          },
+          {
+            "group": "Clients",
+            "pages": [
+              "api-reference/client/add",
+              "api-reference/client/update",
+              "api-reference/client/delete",
+              "api-reference/client/list",
+              "api-reference/client/search",
+              "api-reference/client/user-client"
+            ]
+          },
+          {
+            "group": "Rooms",
+            "pages": [
+              "api-reference/room/add",
+              "api-reference/room/update",
+              "api-reference/room/delete",
+              "api-reference/room/get",
+              "api-reference/room/get-by-client-id",
+              "api-reference/room/get-category",
+              "api-reference/room/measurement-type"
+            ]
+          },
+          {
+            "group": "Measurements",
+            "pages": [
+              "api-reference/measurements/single-window",
+              "api-reference/measurements/single-window-photo",
+              "api-reference/measurements/multiple-window",
+              "api-reference/measurements/specialty-window",
+              "api-reference/measurements/series-window-draperies",
+              "api-reference/measurements/awning",
+              "api-reference/measurements/get",
+              "api-reference/measurements/delete"
+            ]
+          },
+          {
+            "group": "Lead Sources",
+            "pages": [
+              "api-reference/lead-source/get",
+              "api-reference/lead-source/add",
+              "api-reference/lead-source/update",
+              "api-reference/lead-source/user-leadsource"
+            ]
+          },
+          {
+            "group": "Subscriptions",
+            "pages": [
+              "api-reference/transactions/get-user-current-plan",
+              "api-reference/transactions/init-payment",
+              "api-reference/transactions/complete-payment",
+              "api-reference/plans/index"
+            ]
+          },
+          {
+            "group": "Settings",
+            "pages": [
+              "api-reference/countries/index",
+              "api-reference/adminroom/index"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Client management with search and lead source tracking",
+    "Multi-type window measurements (single, multiple, specialty, awnings, draperies)",
+    "Room-based measurement organization",
+    "Bearer token authentication with subscription enforcement",
+    "Stripe-integrated subscription management",
+    "Team and company user collaboration",
+    "Rate-limited REST API with consistent JSON responses"
+  ],
+  "publicApiSurface": [
+    "POST /user/signup",
+    "POST /user/signin",
+    "GET /user/get_profile",
+    "POST /client/add",
+    "POST /client/update",
+    "POST /client/delete",
+    "GET /client/list",
+    "POST /client/search",
+    "POST /room/add",
+    "POST /room/update",
+    "POST /room/delete",
+    "GET /room/get",
+    "POST /measurements/single-window",
+    "POST /measurements/single-window-photo",
+    "POST /measurements/multiple-window",
+    "POST /measurements/specialty-window",
+    "POST /measurements/series-window-draperies",
+    "POST /measurements/awning",
+    "GET /measurements/get",
+    "POST /lead-source/add",
+    "GET /lead-source/get",
+    "GET /transactions/get_user_current_plan",
+    "POST /transactions/init-payment",
+    "POST /transactions/complete-payment",
+    "GET /countries/index"
+  ]
+}

@@ -1,0 +1,349 @@
+---
+title: "Authenticate with the FSS Measurement API"
+description: "Understand the two-layer auth model, learn how to obtain a Bearer token, include it in requests, and handle authentication errors."
+---
+
+The FSS Measurement API uses a two-layer authentication model. Every request — including public ones — must include a static `api-key` header that identifies the calling platform. Protected endpoints additionally require a per-user Bearer token obtained by signing in. This design lets you call public routes freely while keeping user data and account operations secure behind token verification.
+
+## Required headers
+
+The following headers apply to all requests. The `Authorization` header is only required on protected routes.
+
+| Header | Value | Description |
+|---|---|---|
+| `platform` | `WEB`, `IOS`, or `ANDROID` | Identifies the client platform making the request |
+| `api-key` | `FSS2023` | Static key required on every request, including public routes |
+| `Content-Type` | `application/json` | Declares the request body format |
+| `Accept` | `application/json` | Requests a JSON-formatted response |
+| `Authorization` | `Bearer {token}` | Per-user token required on all protected routes |
+
+<Note>
+  The `api-key` value `FSS2023` is a shared platform key, not a secret credential. Your Bearer token — obtained after sign-in — is the user-specific secret that must be kept secure.
+</Note>
+
+## Authentication flow
+
+<Steps>
+  <Step title="Call public endpoints freely">
+    Public routes do not require a Bearer token. Include only the static headers: `platform`, `api-key`, `Content-Type`, and `Accept`.
+
+    ```bash
+    curl --location 'http://fssportal.com/api/v1/user/signup' \
+    --header 'platform: WEB' \
+    --header 'api-key: FSS2023' \
+    --header 'Content-Type: application/json' \
+    --header 'Accept: application/json'
+    ```
+  </Step>
+
+  <Step title="Sign in to get your Bearer token">
+    Call `/user/signin` with your credentials. The response contains `data.api_token` — this is your Bearer token for all subsequent authenticated requests.
+
+    ```bash
+    curl --location 'http://fssportal.com/api/v1/user/signin' \
+    --header 'platform: WEB' \
+    --header 'api-key: FSS2023' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "email": "user@example.com",
+        "password": "password123",
+        "device_token": "",
+        "platform": "WEB"
+    }'
+    ```
+
+    Success response:
+
+    ```json
+    {
+      "message": "Login successful",
+      "data": {
+        "api_token": "abc123def456...",
+        "user": { }
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Use the Bearer token on protected routes">
+    Add the token to the `Authorization` header of every protected request.
+
+    ```bash
+    curl --location 'http://fssportal.com/api/v1/user/get_profile' \
+    --header 'platform: WEB' \
+    --header 'api-key: FSS2023' \
+    --header 'Authorization: Bearer abc123def456...' \
+    --header 'Content-Type: application/json' \
+    --header 'Accept: application/json'
+    ```
+  </Step>
+</Steps>
+
+## Code examples
+
+The `FSSClient` class below handles sign-in and injects the correct headers automatically on every subsequent request.
+
+<CodeGroup>
+
+```javascript JavaScript
+class FSSClient {
+  constructor(apiKey) {
+    this.baseURL = 'http://fssportal.com/api/v1';
+    this.apiKey = apiKey;
+    this.token = null;
+  }
+
+  async signIn(email, password) {
+    const response = await fetch(`${this.baseURL}/user/signin`, {
+      method: 'POST',
+      headers: {
+        'platform': 'WEB',
+        'api-key': this.apiKey,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        device_token: '',
+        platform: 'WEB'
+      })
+    });
+
+    const data = await response.json();
+    this.token = data.data.api_token;
+    return this.token;
+  }
+
+  async makeAuthenticatedRequest(endpoint, method = 'POST', body = null) {
+    const headers = {
+      'platform': 'WEB',
+      'api-key': this.apiKey,
+      'Authorization': `Bearer ${this.token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+
+    const options = { method, headers };
+    if (body) options.body = JSON.stringify(body);
+
+    const response = await fetch(`${this.baseURL}${endpoint}`, options);
+    return response.json();
+  }
+}
+```
+
+```python Python
+import requests
+
+class FSSClient:
+    def __init__(self, api_key):
+        self.base_url = 'http://fssportal.com/api/v1'
+        self.api_key = api_key
+        self.token = None
+
+    def sign_in(self, email, password):
+        response = requests.post(
+            f'{self.base_url}/user/signin',
+            headers={
+                'platform': 'WEB',
+                'api-key': self.api_key,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            json={
+                'email': email,
+                'password': password,
+                'device_token': '',
+                'platform': 'WEB'
+            }
+        )
+
+        data = response.json()
+        self.token = data['data']['api_token']
+        return self.token
+
+    def make_authenticated_request(self, endpoint, method='POST', body=None):
+        headers = {
+            'platform': 'WEB',
+            'api-key': self.api_key,
+            'Authorization': f'Bearer {self.token}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+
+        response = requests.request(
+            method,
+            f'{self.base_url}{endpoint}',
+            headers=headers,
+            json=body
+        )
+
+        return response.json()
+```
+
+```php PHP
+<?php
+
+class FSSClient {
+    private $baseURL = 'http://fssportal.com/api/v1';
+    private $apiKey;
+    private $token;
+
+    public function __construct($apiKey) {
+        $this->apiKey = $apiKey;
+    }
+
+    public function signIn($email, $password) {
+        $ch = curl_init($this->baseURL . '/user/signin');
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'platform: WEB',
+            'api-key: ' . $this->apiKey,
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            'email' => $email,
+            'password' => $password,
+            'device_token' => '',
+            'platform' => 'WEB'
+        ]));
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+        $this->token = $data['data']['api_token'];
+        return $this->token;
+    }
+
+    public function makeAuthenticatedRequest($endpoint, $method = 'POST', $body = null) {
+        $ch = curl_init($this->baseURL . $endpoint);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'platform: WEB',
+            'api-key: ' . $this->apiKey,
+            'Authorization: Bearer ' . $this->token,
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ]);
+
+        if ($body) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        }
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($response, true);
+    }
+}
+```
+
+</CodeGroup>
+
+## Token lifecycle
+
+Bearer tokens do not expire on a fixed schedule, but they are immediately invalidated when any of the following events occur:
+
+- You change your account password
+- You sign out
+- Your account is deactivated by an administrator
+- A security breach is detected on the account
+
+When a token is invalidated, any in-flight request using it will receive a `401 Unauthorized` response. Your integration should handle this by re-authenticating and retrying the request.
+
+## Route reference
+
+### Public routes
+
+These endpoints do not require a Bearer token — only the static `api-key` and `platform` headers:
+
+- `POST /user/signup`
+- `POST /user/signin`
+- `POST /user/qrcode_signin`
+- `POST /user/forgot_password`
+- `POST /user/reset_password/{token}`
+- `POST /user/update_password`
+- `GET /user/settings`
+- `GET /countries/index`
+- `GET /how-works/get`
+
+### Protected routes
+
+All of the following endpoint groups require `Authorization: Bearer {token}`:
+
+- All client management endpoints (`/client/*`)
+- All room management endpoints (`/room/*`)
+- All measurement endpoints (`/measurements/*`)
+- User profile endpoints (`/user/get_profile`, `/user/update_profile`, etc.)
+- Subscription and transaction endpoints (`/transactions/*`)
+
+### Subscription requirement
+
+Most protected endpoints also require an active subscription. If your account has no active plan, the API returns `403 Forbidden`. You can check your current plan status at any time:
+
+```
+GET /transactions/get_user_current_plan
+```
+
+<Tip>
+  Check subscription status early in your integration flow and surface a clear message to end users when their plan has lapsed, rather than letting a `403` surface unexpectedly.
+</Tip>
+
+## Error responses
+
+### 401 Unauthorized
+
+Returned when the Bearer token is missing, malformed, or has been invalidated.
+
+```json
+{
+  "message": "Unauthenticated.",
+  "status": 401
+}
+```
+
+### 403 Forbidden
+
+Returned when the token is valid but the account has no active subscription.
+
+```json
+{
+  "message": "Subscription required.",
+  "status": 403
+}
+```
+
+### 429 Too many requests
+
+Returned when you exceed 60 requests per minute.
+
+```json
+{
+  "message": "Too many requests. Please try again later.",
+  "status": 429
+}
+```
+
+## Security best practices
+
+<CardGroup cols={2}>
+  <Card title="HTTPS only" icon="lock">
+    Always use HTTPS endpoints in production to ensure your token and request data are encrypted in transit.
+  </Card>
+  <Card title="Secure storage" icon="shield">
+    Store Bearer tokens in environment variables or a secrets manager — never hard-code them in source files or commit them to version control.
+  </Card>
+  <Card title="Token rotation" icon="rotate">
+    Implement re-authentication logic so your integration recovers automatically when a token is invalidated, rather than failing silently.
+  </Card>
+  <Card title="Rate limiting" icon="gauge">
+    Track the `X-RateLimit-Remaining` response header and back off before you reach zero to avoid `429` errors disrupting your workflow.
+  </Card>
+</CardGroup>

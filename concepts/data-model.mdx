@@ -1,0 +1,80 @@
+---
+title: "FSS Measurement API Data Model"
+description: "Understand how users, clients, rooms, measurements, and lead sources relate to each other within the FSS Measurement API data model."
+---
+
+The FSS Measurement API is organized around five core entities: users, clients, rooms, measurements, and lead sources. Each entity sits at a specific level in the hierarchy, and understanding how they relate to one another is key to building an integration that works correctly.
+
+## Entity hierarchy
+
+Data in the FSS Measurement API flows from your authenticated account downward:
+
+```
+User
+└── Clients
+    └── Rooms
+        └── Measurements
+```
+
+A **user** owns one or more **clients**. Each client can contain one or more **rooms**. Each room holds one or more **measurements**. Lead sources are independent records that you associate with clients at creation time.
+
+## Entities
+
+### User
+
+A user is the authenticated account that owns all data in the API. Every user belongs to a company and can invite team members to collaborate. When you authenticate with an `X-API-Token`, all requests run in the context of that user. Clients, rooms, and measurements created through your token belong to your account.
+
+### Client
+
+A client represents one of your end-customers — a person or organization whose windows you are measuring. Each client record includes:
+
+- Contact information: name, email, phone number
+- Physical address and billing address
+- An optional project name and quote number
+- An optional link to a lead source
+
+Clients belong to the user who creates them. You can also retrieve clients shared across your company using the `POST /client/user-client` endpoint.
+
+### Room
+
+A room is a named space within a client's project — for example, "Living Room", "Master Bedroom", or "Kitchen". Rooms belong to clients and serve as the organizational unit for grouping measurements. Each room has a **measurement type** that determines which measurement form applies to windows in that room.
+
+Rooms reference an `admin_room_id` that maps to a predefined room category. Use `GET /room/get-category` to retrieve the available categories.
+
+### Measurement
+
+A measurement is a window measurement record attached to a specific room. It captures all dimensional data for one or more windows, including width, height, depth, and additional fields that vary by type. Measurements also support notes, installation instructions, and custom fields.
+
+The API supports six measurement types:
+
+| Type | Description |
+|---|---|
+| `single-window` | Standard single window measurement capturing width, height, and depth |
+| `single-window-photo` | Single window measurement with full dimensional detail and optional photo upload |
+| `multiple-window` | Multiple windows recorded in a single entry, each with its own dimensions |
+| `specialty-window` | Non-standard window shapes such as arches or trapezoids |
+| `series-window-draperies` | A series of windows with drapery-specific measurements including curtain rod and trim data |
+| `awning` | Awning measurements including projection, width, and mount height |
+
+### Lead source
+
+A lead source identifies the marketing channel or referral source that brought a client to you — for example, "Google Ads", "Referral", or a specific partner. Lead sources are managed separately and referenced on client records via `lead_source_id`. Use `GET /lead-source/get` to retrieve the lead sources available to your account.
+
+## Pagination
+
+List endpoints in the FSS Measurement API return paginated results. The response envelope includes the following fields to help you navigate pages:
+
+| Field | Type | Description |
+|---|---|---|
+| `current_page` | integer | The page number returned in this response |
+| `per_page` | integer | Number of records per page (default: 20) |
+| `total` | integer | Total number of records matching your query |
+| `last_page` | integer | The highest page number available |
+| `next_page_url` | string or null | URL for the next page, or `null` if on the last page |
+| `prev_page_url` | string or null | URL for the previous page, or `null` if on the first page |
+
+Pass `page` and `limit` in your request body to control which page is returned and how many records appear per page.
+
+<Note>
+Most API operations require an active subscription. If your subscription has expired, protected endpoints return a `403` response. See [Subscription Plans and API Access](/concepts/subscriptions) for details on checking and renewing your plan.
+</Note>

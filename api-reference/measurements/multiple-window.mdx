@@ -1,0 +1,269 @@
+---
+title: "POST /measurements/multiple_window — Multiple Windows"
+sidebarTitle: "Multiple Windows"
+description: "POST /measurements/multiple_window — Submit measurements for multiple windows in one request. Accepts an array of window measurement objects."
+---
+
+Use this endpoint when you need to record measurements for several windows in a single API call. Instead of making one request per window, you submit an array of window objects alongside the shared client and room identifiers. Each object in the array follows the same field structure as the single window endpoint. If you include an `id` in an individual window object, that record is updated; pass `0` or omit the field to create it.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/measurements/multiple_window_add_edit
+```
+
+## Required Headers
+
+| Header          | Value                  |
+| --------------- | ---------------------- |
+| `platform`      | `WEB`                  |
+| `api-key`       | `FSS2023`              |
+| `Authorization` | `Bearer {your_token}`  |
+| `Content-Type`  | `application/json`     |
+
+## Request Body
+
+<ParamField body="client_id" type="integer" required>
+  The ID of the client these measurements belong to.
+</ParamField>
+
+<ParamField body="room_id" type="integer" required>
+  The ID of the room where the windows are located.
+</ParamField>
+
+<ParamField body="user_id" type="integer" required>
+  The ID of the user recording the measurements.
+</ParamField>
+
+<ParamField body="measurement_type_id" type="integer" required>
+  The measurement type identifier. Pass `1` for standard window measurements.
+</ParamField>
+
+<ParamField body="unit_type" type="string" required>
+  The unit system for all dimension values across all windows. Accepted values: `"Imperial"`, `"Metrix"`.
+</ParamField>
+
+<ParamField body="windows" type="array" required>
+  An array of window measurement objects. Each object accepts the fields listed below.
+
+  <Expandable title="Window object fields">
+    <ParamField body="id" type="integer">
+      ID of an existing window measurement to update. Pass `0` to create a new record.
+    </ParamField>
+    <ParamField body="window_name" type="string" required>
+      A descriptive label for this window, e.g. `"Window A"`.
+    </ParamField>
+    <ParamField body="mount_type" type="string">
+      Mount style for this window: `"Inside"` or `"Outside"`.
+    </ParamField>
+    <ParamField body="w_top" type="string">
+      Width at the top of the opening.
+    </ParamField>
+    <ParamField body="w_middle" type="string">
+      Width at the middle of the opening.
+    </ParamField>
+    <ParamField body="w_bottom" type="string">
+      Width at the bottom of the opening.
+    </ParamField>
+    <ParamField body="h_left" type="string">
+      Height on the left side of the opening.
+    </ParamField>
+    <ParamField body="h_middle" type="string">
+      Height at the centre of the opening.
+    </ParamField>
+    <ParamField body="h_right" type="string">
+      Height on the right side of the opening.
+    </ParamField>
+    <ParamField body="d_sill" type="string">
+      Sill depth for this window.
+    </ParamField>
+    <ParamField body="left_edge_w" type="string">
+      Distance from the left frame edge to the nearest wall or obstruction.
+    </ParamField>
+    <ParamField body="right_edge_w" type="string">
+      Distance from the right frame edge to the nearest wall or obstruction.
+    </ParamField>
+    <ParamField body="top_edge_to_ceiling_h" type="string">
+      Distance from the top of the frame to the ceiling.
+    </ParamField>
+    <ParamField body="bottom_edge_to_floor_h" type="string">
+      Distance from the bottom of the frame to the floor.
+    </ParamField>
+    <ParamField body="wall_to_wall_w" type="string">
+      Total wall-to-wall width at this window position.
+    </ParamField>
+    <ParamField body="floor_to_ceiling_h" type="string">
+      Floor-to-ceiling height at this window position.
+    </ParamField>
+    <ParamField body="bottom_trim_to_floor" type="string">
+      Distance from the bottom trim to the floor.
+    </ParamField>
+    <ParamField body="square_feet" type="string">
+      Square footage estimate for this window.
+    </ParamField>
+    <ParamField body="note" type="string">
+      Free-text notes specific to this window.
+    </ParamField>
+    <ParamField body="installation_instructions" type="string">
+      Installation instructions specific to this window.
+    </ParamField>
+    <ParamField body="for_shutter" type="string">
+      Indicates whether this window measurement is for a shutter product.
+    </ParamField>
+    <ParamField body="focus_width" type="string">
+      Solatech Focus integration width value.
+    </ParamField>
+    <ParamField body="focus_width_key" type="string">
+      Key identifier for the Solatech Focus width field.
+    </ParamField>
+    <ParamField body="focus_height" type="string">
+      Solatech Focus integration height value.
+    </ParamField>
+    <ParamField body="focus_height_key" type="string">
+      Key identifier for the Solatech Focus height field.
+    </ParamField>
+    <ParamField body="offset_value" type="string">
+      Offset adjustment applied to this window's dimensions.
+    </ParamField>
+    <ParamField body="offset_value_keys" type="string">
+      Keys identifying which fields the offset applies to.
+    </ParamField>
+    <ParamField body="measurement_unique_id" type="string">
+      Optional unique identifier for Solatech Focus integration.
+    </ParamField>
+    <ParamField body="min_value_fields" type="string">
+      Minimum value constraints for specific dimension fields.
+    </ParamField>
+    <ParamField body="total_custom_fields" type="integer">
+      The count of custom fields included in `custom_field`.
+    </ParamField>
+    <ParamField body="custom_field" type="object">
+      Custom measurement fields for this window. Pass `[]` when unused.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="message" type="string">
+  A human-readable confirmation, e.g. `"Measurement added successfully!"`.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An empty array on success. Populated with error detail when validation fails.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://fssportal.com/api/v1/measurements/multiple_window_add_edit \
+  --header "platform: WEB" \
+  --header "api-key: FSS2023" \
+  --header "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  --header "Content-Type: application/json" \
+  --data '{
+    "client_id": 1856,
+    "room_id": 4945,
+    "user_id": 68,
+    "measurement_type_id": 1,
+    "unit_type": "Imperial",
+    "windows": [
+      {
+        "id": 0,
+        "window_name": "Window A — Left",
+        "mount_type": "Inside",
+        "w_top": "36.00",
+        "w_middle": "35.75",
+        "w_bottom": "35.50",
+        "h_left": "48.00",
+        "h_middle": "48.00",
+        "h_right": "47.75",
+        "d_sill": "4.50",
+        "left_edge_w": "6.00",
+        "right_edge_w": "3.00",
+        "top_edge_to_ceiling_h": "12.00",
+        "bottom_edge_to_floor_h": "24.00",
+        "wall_to_wall_w": "45.00",
+        "floor_to_ceiling_h": "96.00",
+        "bottom_trim_to_floor": "22.50",
+        "square_feet": "12.00",
+        "note": "",
+        "installation_instructions": "",
+        "for_shutter": "",
+        "focus_width": "",
+        "focus_width_key": "",
+        "focus_height": "",
+        "focus_height_key": "",
+        "offset_value": "",
+        "offset_value_keys": "",
+        "measurement_unique_id": "",
+        "min_value_fields": "",
+        "total_custom_fields": 0,
+        "custom_field": []
+      },
+      {
+        "id": 0,
+        "window_name": "Window B — Right",
+        "mount_type": "Inside",
+        "w_top": "24.00",
+        "w_middle": "23.75",
+        "w_bottom": "23.50",
+        "h_left": "36.00",
+        "h_middle": "36.00",
+        "h_right": "35.75",
+        "d_sill": "4.50",
+        "left_edge_w": "3.00",
+        "right_edge_w": "6.00",
+        "top_edge_to_ceiling_h": "12.00",
+        "bottom_edge_to_floor_h": "36.00",
+        "wall_to_wall_w": "33.00",
+        "floor_to_ceiling_h": "96.00",
+        "bottom_trim_to_floor": "34.50",
+        "square_feet": "6.00",
+        "note": "",
+        "installation_instructions": "",
+        "for_shutter": "",
+        "focus_width": "",
+        "focus_width_key": "",
+        "focus_height": "",
+        "focus_height_key": "",
+        "offset_value": "",
+        "offset_value_keys": "",
+        "measurement_unique_id": "",
+        "min_value_fields": "",
+        "total_custom_fields": 0,
+        "custom_field": []
+      }
+    ]
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200 Success
+{
+  "message": "Measurement added successfully!",
+  "data": []
+}
+```
+
+```json 422 Validation Error
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "client_id": ["The client id field is required."],
+    "windows": ["The windows field must be an array."]
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

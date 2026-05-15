@@ -1,0 +1,192 @@
+---
+title: "POST /lead-source/user-leadsource — Assign Lead Source"
+sidebarTitle: "Assign Lead Source"
+description: "POST /lead-source/user-leadsource — Returns lead sources scoped to the current user. Use for per-user lead attribution in multi-member company accounts."
+---
+
+Use this endpoint to retrieve the lead sources that belong specifically to the authenticated user within your company account. Unlike the global get endpoint, this endpoint returns a paginated list scoped only to the current user, making it useful for managing lead attribution on a per-user basis. The response includes pagination metadata so you can iterate through large result sets.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/lead-source/user-leadsource
+```
+
+<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+
+## Request headers
+
+<ParamField header="platform" type="string" required>
+  Must be `WEB`.
+</ParamField>
+
+<ParamField header="api-key" type="string" required>
+  Your FSS API key. Use `FSS2023`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from your login response. Format: `Bearer {your_token}`.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`.
+</ParamField>
+
+## Request body
+
+No request body is required for this endpoint.
+
+## Response fields
+
+<ResponseField name="message" type="string">
+  A human-readable status message, e.g. `"Lead Source get successfully."`.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  A paginated result set containing the user's lead sources.
+  <Expandable title="Pagination wrapper">
+    <ResponseField name="current_page" type="integer">
+      The current page number.
+    </ResponseField>
+    <ResponseField name="data" type="array">
+      Array of lead source records for the current page.
+      <Expandable title="Lead source object">
+        <ResponseField name="id" type="integer">
+          Unique identifier for the lead source record.
+        </ResponseField>
+        <ResponseField name="company_name" type="string">
+          Company or organization name. May be empty.
+        </ResponseField>
+        <ResponseField name="name" type="string">
+          First name of the lead source contact.
+        </ResponseField>
+        <ResponseField name="surname" type="string">
+          Last name of the lead source contact.
+        </ResponseField>
+        <ResponseField name="email" type="string">
+          Email address of the lead source contact.
+        </ResponseField>
+        <ResponseField name="phone_no" type="string">
+          Phone number. May be empty.
+        </ResponseField>
+        <ResponseField name="address" type="string">
+          Street address. May be empty.
+        </ResponseField>
+        <ResponseField name="city" type="string">
+          City. May be empty.
+        </ResponseField>
+        <ResponseField name="state" type="string">
+          State or region. May be empty or `"Not Found"`.
+        </ResponseField>
+        <ResponseField name="zip_code" type="string">
+          Postal or ZIP code. May be empty.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="first_page_url" type="string">
+      URL for the first page of results.
+    </ResponseField>
+    <ResponseField name="from" type="integer">
+      The index of the first record on the current page (1-based).
+    </ResponseField>
+    <ResponseField name="last_page" type="integer">
+      Total number of pages available.
+    </ResponseField>
+    <ResponseField name="last_page_url" type="string">
+      URL for the last page of results.
+    </ResponseField>
+    <ResponseField name="links" type="array">
+      Pagination links array with previous, numbered, and next page entries.
+      <Expandable title="Link object">
+        <ResponseField name="url" type="string">
+          URL for the page. `null` if the link is not active (e.g. no previous page).
+        </ResponseField>
+        <ResponseField name="label" type="string">
+          Display label for the link, e.g. `"1"`, `"&laquo; Previous"`, `"Next &raquo;"`.
+        </ResponseField>
+        <ResponseField name="active" type="boolean">
+          `true` if this link represents the current page.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="next_page_url" type="string">
+      URL for the next page, or `null` if you are on the last page.
+    </ResponseField>
+    <ResponseField name="path" type="string">
+      The base URL for this endpoint.
+    </ResponseField>
+    <ResponseField name="per_page" type="integer">
+      Number of records returned per page. Default is `20`.
+    </ResponseField>
+    <ResponseField name="prev_page_url" type="string">
+      URL for the previous page, or `null` if you are on the first page.
+    </ResponseField>
+    <ResponseField name="to" type="integer">
+      The index of the last record on the current page (1-based).
+    </ResponseField>
+    <ResponseField name="total" type="integer">
+      Total number of lead source records for this user.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://fssportal.com/api/v1/lead-source/user-leadsource \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "message": "Lead Source get successfully.",
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 148,
+        "company_name": "Acme Corp",
+        "name": "Jane",
+        "surname": "Doe",
+        "email": "jane.doe@example.com",
+        "phone_no": "5551234567",
+        "address": "123 Main Street",
+        "city": "Dallas",
+        "state": "Texas",
+        "zip_code": "75201"
+      }
+    ],
+    "first_page_url": "https://fssportal.com/api/v1/lead-source/user-leadsource?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "https://fssportal.com/api/v1/lead-source/user-leadsource?page=1",
+    "links": [
+      { "url": null, "label": "&laquo; Previous", "active": false },
+      { "url": "https://fssportal.com/api/v1/lead-source/user-leadsource?page=1", "label": "1", "active": true },
+      { "url": null, "label": "Next &raquo;", "active": false }
+    ],
+    "next_page_url": null,
+    "path": "https://fssportal.com/api/v1/lead-source/user-leadsource",
+    "per_page": 20,
+    "prev_page_url": null,
+    "to": 1,
+    "total": 1
+  }
+}
+```
+
+```json 401
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

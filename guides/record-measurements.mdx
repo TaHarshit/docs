@@ -1,0 +1,310 @@
+---
+title: "Record Window Measurements via the API"
+description: "Learn how to submit, retrieve, and delete window measurements for clients and rooms using the FSS Measurement API, with curl and JS examples."
+---
+
+Measurements are the core data in the FSS Measurement API. Every measurement record is attached to a room, which in turn belongs to a client. The API supports six measurement types to cover standard windows, specialty shapes, photo-based workflows, window series with draperies, and awnings. Before you can submit a measurement, you need both a client and a room.
+
+## Measurement types
+
+<CardGroup cols={2}>
+  <Card title="Single window" href="/api-reference/measurements/single-window">
+    Captures width, height, and depth for a standard single window.
+  </Card>
+  <Card title="Single window with photo" href="/api-reference/measurements/single-window-photo">
+    Full dimensional detail for a single window with support for reference images.
+  </Card>
+  <Card title="Multiple windows" href="/api-reference/measurements/multiple-window">
+    Records several windows in one entry, each with its own dimensions.
+  </Card>
+  <Card title="Specialty window" href="/api-reference/measurements/specialty-window">
+    Handles non-standard shapes such as arches, trapezoids, and other custom geometries.
+  </Card>
+  <Card title="Series window with draperies" href="/api-reference/measurements/series-window-draperies">
+    Measures a series of windows alongside drapery-specific data: curtain rod, trim, and wall-to-wall dimensions.
+  </Card>
+  <Card title="Awning" href="/api-reference/measurements/awning">
+    Captures awning-specific fields including projection, width, and mount height.
+  </Card>
+</CardGroup>
+
+## Workflow
+
+<Steps>
+  <Step title="Ensure the client exists">
+    Every measurement belongs to a client. Create one with `POST /client/add` or find an existing record with `POST /client/search`. See [Manage Clients](/guides/manage-clients) for details.
+  </Step>
+  <Step title="Ensure the room exists">
+    Measurements attach to a room. Create one with `POST /room/add` or retrieve existing rooms with `POST /room/get`. See [Organize Projects with Rooms](/guides/manage-rooms) for details. Note the `room_id` returned when you create or fetch a room.
+  </Step>
+  <Step title="Submit the measurement">
+    Call the appropriate measurement endpoint with the `client_id`, `room_id`, and measurement fields for the window type you are recording.
+  </Step>
+</Steps>
+
+## Submitting a single-window measurement
+
+`POST /measurements/single_window_add_edit` creates or updates a standard single window record. Pass `id: 0` to create a new record, or the existing measurement ID to update it.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/measurements/single_window_add_edit \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": 1856,
+    "room_id": 4945,
+    "window_type": "single",
+    "width": 36,
+    "height": 48,
+    "depth": 2,
+    "notes": "Living room front window"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/measurements/single_window_add_edit', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    client_id: 1856,
+    room_id: 4945,
+    window_type: 'single',
+    width: 36,
+    height: 48,
+    depth: 2,
+    notes: 'Living room front window'
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+```json
+{
+  "status": "success",
+  "data": {
+    "id": 789,
+    "client_id": 1856,
+    "room_id": 4945,
+    "window_type": "single",
+    "width": 36,
+    "height": 48,
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+## Submitting a single-window-photo measurement
+
+`POST /measurements/single_window_photo_add_edit` accepts the full set of dimensional fields for a single window. This type captures measurements at three points across the width and height (top/middle/bottom and left/middle/right) along with edge, clearance, and context measurements.
+
+<Note>
+The single-window-photo endpoint uses `application/json`. If you need to upload a reference image file alongside measurement data, use `multipart/form-data` and include the image as a form file field. Ensure your `Content-Type` header matches the encoding you use.
+</Note>
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/measurements/single_window_photo_add_edit \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 0,
+    "user_id": 68,
+    "client_id": 1856,
+    "room_id": 4945,
+    "measurement_type_id": 1,
+    "unit_type": "Imperial",
+    "window_name": "Front Left",
+    "w_top": "36.00",
+    "w_middle": "35.75",
+    "w_bottom": "36.00",
+    "h_left": "48.00",
+    "h_middle": "48.00",
+    "h_right": "47.75",
+    "d_sill": "4.50",
+    "note": "Slight bow in middle width",
+    "total_custom_fields": 0,
+    "custom_field": []
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/measurements/single_window_photo_add_edit', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    id: 0,
+    user_id: 68,
+    client_id: 1856,
+    room_id: 4945,
+    measurement_type_id: 1,
+    unit_type: 'Imperial',
+    window_name: 'Front Left',
+    w_top: '36.00',
+    w_middle: '35.75',
+    w_bottom: '36.00',
+    h_left: '48.00',
+    h_middle: '48.00',
+    h_right: '47.75',
+    d_sill: '4.50',
+    note: 'Slight bow in middle width',
+    total_custom_fields: 0,
+    custom_field: []
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+```json
+{
+  "message": "Measurement added successfully!",
+  "data": []
+}
+```
+
+### Uploading a photo with multipart/form-data
+
+When you need to attach a reference image, send the request as `multipart/form-data`:
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/measurements/single_window_photo_add_edit \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -F "id=0" \
+  -F "user_id=68" \
+  -F "client_id=1856" \
+  -F "room_id=4945" \
+  -F "measurement_type_id=1" \
+  -F "unit_type=Imperial" \
+  -F "window_name=Front Left" \
+  -F "w_top=36.00" \
+  -F "h_left=48.00" \
+  -F "reference_image=@/path/to/photo.jpg"
+```
+
+## Retrieving measurements
+
+Use `POST /measurements/get` to fetch measurements for a specific client and room. You can filter by `room_id`, `group_id`, and `measurement_type_id`.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/measurements/get \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": 1856,
+    "room_id": 4945,
+    "group_id": 11157,
+    "measurement_type_id": 1
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/measurements/get', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    client_id: 1856,
+    room_id: 4945,
+    group_id: 11157,
+    measurement_type_id: 1
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+The response contains a `measurements` array. Each entry includes the full set of dimension fields for that measurement type along with metadata such as `created_at`, `status`, and any attached `images`.
+
+```json
+{
+  "message": "Measurement details get successfully!",
+  "data": {
+    "measurements": [
+      {
+        "id": 12170,
+        "client_id": 1856,
+        "room_id": 4945,
+        "group_id": 11157,
+        "measurement_type_id": 1,
+        "window_name": "Front Left",
+        "w_top": "36.000",
+        "w_middle": "35.750",
+        "w_bottom": "36.000",
+        "h_left": "48.000",
+        "h_middle": "48.000",
+        "h_right": "47.750",
+        "d_sill": "4.500",
+        "note": "Slight bow in middle width",
+        "status": 1,
+        "created_at": "2026-05-14T12:01:04.000000Z",
+        "images": []
+      }
+    ]
+  }
+}
+```
+
+## Deleting a measurement
+
+Use `POST /measurements/delete` to permanently remove a measurement record. Pass the `measurement_id` of the record to delete.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/measurements/delete \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "measurement_id": 12170
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/measurements/delete', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ measurement_id: 12170 })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+<Warning>
+Measurement deletion is permanent and cannot be undone. Retrieve the measurement data before deleting if you need to archive it.
+</Warning>
+
+## API reference
+
+- [`POST /measurements/single_window_add_edit`](/api-reference/measurements/single-window) — Single window
+- [`POST /measurements/single_window_photo_add_edit`](/api-reference/measurements/single-window-photo) — Single window with photo
+- [`POST /measurements/multiple_window_add_edit`](/api-reference/measurements/multiple-window) — Multiple windows
+- [`POST /measurements/specialty_window_add_edit`](/api-reference/measurements/specialty-window) — Specialty window
+- [`POST /measurements/series_window_with_draperies_add_edit`](/api-reference/measurements/series-window-draperies) — Series window with draperies
+- [`POST /measurements/awning_measurement_add_edit`](/api-reference/measurements/awning) — Awning
+- [`POST /measurements/get`](/api-reference/measurements/get) — Retrieve measurements
+- [`POST /measurements/delete`](/api-reference/measurements/delete) — Delete a measurement

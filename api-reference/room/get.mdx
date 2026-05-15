@@ -1,0 +1,146 @@
+---
+title: "GET /room/get — Get Room Details"
+sidebarTitle: "Get Room"
+description: "GET /room/get — Retrieve all measurements associated with a specific room by client ID and room ID. Returns measurement type, group, and window details."
+---
+
+Use this endpoint to retrieve all measurements associated with a specific room. You provide both the client ID and the room ID to scope the request. The response returns an array of measurement records, each containing the measurement type, group, and window details for that room.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/room/get
+```
+
+<Note>
+  Although this endpoint retrieves data, it uses the `POST` HTTP method and accepts parameters in the request body.
+</Note>
+
+## Headers
+
+| Header          | Value                  | Required |
+|-----------------|------------------------|----------|
+| `platform`      | `WEB`                  | Yes      |
+| `api-key`       | `FSS2023`              | Yes      |
+| `Authorization` | `Bearer {your_token}`  | Yes      |
+| `Content-Type`  | `application/json`     | Yes      |
+
+## Request Body
+
+<ParamField body="client_id" type="integer" required>
+  The ID of the client whose room you want to retrieve. This scopes the lookup to a specific client's project.
+</ParamField>
+
+<ParamField body="room_id" type="integer" required>
+  The ID of the room to retrieve. All measurements belonging to this room are returned.
+</ParamField>
+
+## Response
+
+<ResponseField name="message" type="string">
+  A human-readable status message, for example `"Rooms get successfully."`.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An array of measurement records associated with the room. Each item represents one measurement entry.
+  <Expandable title="data item">
+    <ResponseField name="room_id" type="integer">
+      The unique ID of the room these measurements belong to.
+    </ResponseField>
+    <ResponseField name="admin_room_id" type="object">
+      The ID of the predefined room type, or `null` if no room type was assigned.
+    </ResponseField>
+    <ResponseField name="measurement_type_id" type="integer">
+      The numeric ID of the measurement type used for this entry.
+    </ResponseField>
+    <ResponseField name="measurement_type_name" type="string">
+      The display name of the measurement type, for example `"Single Window Form"`.
+    </ResponseField>
+    <ResponseField name="measurement_id" type="integer">
+      The unique ID of this measurement record.
+    </ResponseField>
+    <ResponseField name="group_id" type="integer">
+      The ID of the measurement group this record belongs to.
+    </ResponseField>
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp indicating when the measurement was created.
+    </ResponseField>
+    <ResponseField name="window_name" type="string">
+      The name assigned to the window for this measurement entry.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --location 'https://fssportal.com/api/v1/room/get' \
+--header 'platform: WEB' \
+--header 'api-key: FSS2023' \
+--header 'Authorization: Bearer {your_token}' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "client_id": 1856,
+  "room_id": 4945
+}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200 Success
+{
+  "message": "Rooms get successfully.",
+  "data": [
+    {
+      "room_id": 4945,
+      "admin_room_id": null,
+      "measurement_type_id": 1,
+      "measurement_type_name": "Single Window Form",
+      "measurement_id": 12170,
+      "group_id": 11157,
+      "created_at": "2026-05-14T12:01:04.000000Z",
+      "window_name": "test"
+    },
+    {
+      "room_id": 4945,
+      "admin_room_id": null,
+      "measurement_type_id": 1,
+      "measurement_type_name": "Single Window Form",
+      "measurement_id": 12171,
+      "group_id": 11158,
+      "created_at": "2026-05-14T12:30:36.000000Z",
+      "window_name": "test"
+    },
+    {
+      "room_id": 4945,
+      "admin_room_id": null,
+      "measurement_type_id": 1,
+      "measurement_type_name": "Single Window Form",
+      "measurement_id": 12172,
+      "group_id": 11159,
+      "created_at": "2026-05-14T12:32:51.000000Z",
+      "window_name": "test"
+    }
+  ]
+}
+```
+
+```json 401 Unauthorized
+{
+  "message": "Unauthenticated."
+}
+```
+
+```json 422 Unprocessable Entity
+{
+  "message": "The client_id field is required.",
+  "errors": {
+    "client_id": ["The client_id field is required."],
+    "room_id": ["The room_id field is required."]
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,197 @@
+---
+title: "GET /user/get_profile — Retrieve Your Profile"
+sidebarTitle: "Get Profile"
+description: "GET /user/get_profile — Returns the authenticated user's full profile including name, email, company, subscription status, and measurement preferences."
+---
+
+Use this endpoint to retrieve the full profile of the currently authenticated user. The response includes personal details, company information, subscription status, and account preferences such as measurement units and field display ordering.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/user/get_profile
+```
+
+<Note>
+  The source API accepts `POST` for this endpoint even though it reads data. No request body is required.
+</Note>
+
+## Required headers
+
+| Header          | Value                  |
+| --------------- | ---------------------- |
+| `platform`      | `WEB`                  |
+| `api-key`       | `FSS2023`              |
+| `Authorization` | `Bearer {your_token}`  |
+| `Content-Type`  | `application/json`     |
+
+## Request body
+
+No request body is required for this endpoint.
+
+## Response fields
+
+<ResponseField name="message" type="string">
+  A human-readable status message, e.g. `"Profile get successfully."`.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  The authenticated user's profile object.
+
+  <Expandable title="data properties">
+    <ResponseField name="id" type="integer">
+      Unique numeric identifier for the user.
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      The user's full name.
+    </ResponseField>
+    <ResponseField name="email" type="string">
+      The user's email address.
+    </ResponseField>
+    <ResponseField name="country_code" type="string">
+      International dialing code for the user's phone number, e.g. `"+1"`.
+    </ResponseField>
+    <ResponseField name="phone_no" type="string">
+      The user's phone number (without country code).
+    </ResponseField>
+    <ResponseField name="profile_image" type="string">
+      Relative path to the user's profile image.
+    </ResponseField>
+    <ResponseField name="company_name" type="string">
+      The internal identifier or name of the company the user belongs to.
+    </ResponseField>
+    <ResponseField name="own_company_name" type="string">
+      The display name of the user's company.
+    </ResponseField>
+    <ResponseField name="company_logo" type="string">
+      Filename of the company logo image.
+    </ResponseField>
+    <ResponseField name="company_owner" type="integer">
+      `1` if the user is the company owner, `0` otherwise.
+    </ResponseField>
+    <ResponseField name="user_type" type="integer">
+      Numeric code indicating the user's role type.
+    </ResponseField>
+    <ResponseField name="status" type="integer">
+      Account status. `1` indicates active.
+    </ResponseField>
+    <ResponseField name="email_verified_at" type="string | null">
+      ISO 8601 timestamp of email verification, or `null` if not yet verified.
+    </ResponseField>
+    <ResponseField name="platform" type="string">
+      The platform from which the account was last accessed, e.g. `"IOS"` or `"WEB"`.
+    </ResponseField>
+    <ResponseField name="device_token" type="string">
+      Push notification device token.
+    </ResponseField>
+    <ResponseField name="device_type" type="string">
+      The device model, e.g. `"iPhone"`.
+    </ResponseField>
+    <ResponseField name="device_number" type="object | null">
+      Device number object, if applicable.
+    </ResponseField>
+    <ResponseField name="measurement_unit" type="string">
+      Preferred unit system, e.g. `"Imperial"` or `"Metric"`.
+    </ResponseField>
+    <ResponseField name="field_display_orders" type="string">
+      JSON-encoded string defining the custom ordering of measurement fields by window type.
+    </ResponseField>
+    <ResponseField name="api_key" type="string">
+      The user's personal API key.
+    </ResponseField>
+    <ResponseField name="solatech_focus_email" type="string">
+      Email address used for Solatech Focus integration.
+    </ResponseField>
+    <ResponseField name="solatech_focus_on" type="integer">
+      `1` if Solatech Focus integration is enabled, `0` otherwise.
+    </ResponseField>
+    <ResponseField name="stripe_customer_id" type="string">
+      Stripe customer ID associated with the account.
+    </ResponseField>
+    <ResponseField name="stripe_id" type="string">
+      Additional Stripe identifier.
+    </ResponseField>
+    <ResponseField name="stripe_payment_method_id" type="string | null">
+      The saved Stripe payment method ID, or `null` if none is set.
+    </ResponseField>
+    <ResponseField name="pm_type" type="string">
+      Payment method card brand, e.g. `"visa"`.
+    </ResponseField>
+    <ResponseField name="pm_last_four" type="string">
+      Last four digits of the saved payment card.
+    </ResponseField>
+    <ResponseField name="in_app_purchase_receipt_id" type="string | null">
+      In-app purchase receipt ID for mobile subscriptions, or `null`.
+    </ResponseField>
+    <ResponseField name="cash_sub_end_date" type="string">
+      Expiry date of a manually applied subscription in `YYYY-MM-DD` format.
+    </ResponseField>
+    <ResponseField name="trial_ends_at" type="string">
+      ISO 8601 timestamp indicating when the trial period ends.
+    </ResponseField>
+    <ResponseField name="last_plan_switch_at" type="string">
+      ISO 8601 timestamp of the most recent subscription plan change.
+    </ResponseField>
+    <ResponseField name="post" type="object | null">
+      Associated post object, if any.
+    </ResponseField>
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of when the account was created.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url https://fssportal.com/api/v1/user/get_profile \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "message": "Profile get successfully.",
+  "data": {
+    "id": 68,
+    "user_type": 2,
+    "company_name": "212785350",
+    "own_company_name": "Tech Company",
+    "name": "Krunal Nagvadia",
+    "country_code": "+1",
+    "phone_no": "8460008773",
+    "profile_image": "/storage/profile_image/placeholder.jpg",
+    "company_logo": "1775903654_69da23a601a39.png",
+    "device_number": null,
+    "stripe_customer_id": "cus_OqynCAyX9V0zUv",
+    "stripe_payment_method_id": null,
+    "in_app_purchase_receipt_id": null,
+    "status": 1,
+    "email": "user@example.com",
+    "email_verified_at": null,
+    "device_token": "0F790F62-FE71-4DC3-87FC-0412B1E165FE",
+    "platform": "IOS",
+    "company_owner": 1,
+    "measurement_unit": "Imperial",
+    "cash_sub_end_date": "2024-12-06",
+    "created_at": "2023-10-07T11:00:18.000000Z",
+    "pm_type": "visa",
+    "pm_last_four": "4242",
+    "trial_ends_at": "2026-04-30T20:31:20.000000Z",
+    "last_plan_switch_at": "2026-01-05T11:54:27.000000Z",
+    "device_type": "iPhone",
+    "post": null
+  }
+}
+```
+
+</ResponseExample>

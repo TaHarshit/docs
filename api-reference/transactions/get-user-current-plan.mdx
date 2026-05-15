@@ -1,0 +1,107 @@
+---
+title: "GET /transactions/get_user_current_plan"
+sidebarTitle: "Current Plan"
+description: "GET /transactions/get_user_current_plan — Returns the authenticated user's current subscription plan, status, and expiration date."
+---
+
+Use this endpoint to check which FSS Measurement subscription plan is currently active on your account. The response includes the plan name, subscription status, and the date your subscription renews or expires. If you have no active subscription, the API returns an error response with a descriptive message.
+
+## Endpoint
+
+```
+GET https://fssportal.com/api/v1/transactions/get_user_current_plan
+```
+
+<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+
+## Request headers
+
+<ParamField header="platform" type="string" required>
+  Must be `WEB`.
+</ParamField>
+
+<ParamField header="api-key" type="string" required>
+  Your FSS API key. Use `FSS2023`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from your login response. Format: `Bearer {your_token}`.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`.
+</ParamField>
+
+## Request body
+
+No request body is required for this endpoint.
+
+## Response fields
+
+<ResponseField name="status" type="string">
+  `"success"` on a successful response, or `"error"` if the request could not be fulfilled.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  The current subscription plan details. Only present when `status` is `"success"`.
+  <Expandable title="Plan object">
+    <ResponseField name="plan_id" type="integer">
+      Unique identifier of the active plan.
+    </ResponseField>
+    <ResponseField name="plan_name" type="string">
+      Human-readable name of the plan, e.g. `"Basic"` or `"Pro"`.
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      Current subscription status, e.g. `"active"` or `"cancelled"`.
+    </ResponseField>
+    <ResponseField name="renews_at" type="string">
+      Date on which the subscription next renews, in `YYYY-MM-DD` format.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Error message returned when `status` is `"error"`, e.g. `"No active subscription"`.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://fssportal.com/api/v1/transactions/get_user_current_plan \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "status": "success",
+  "data": {
+    "plan_id": 1,
+    "plan_name": "Basic",
+    "status": "active",
+    "renews_at": "2026-06-15"
+  }
+}
+```
+
+```json 200 (no active plan)
+{
+  "status": "error",
+  "message": "No active subscription"
+}
+```
+
+```json 401
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,150 @@
+---
+title: "GET /lead-source/get — List Your Lead Sources"
+sidebarTitle: "Get Lead Sources"
+description: "GET /lead-source/get — Returns all lead source records in your account, including contact and address details. Use the returned IDs to tag clients by origin."
+---
+
+Use this endpoint to retrieve every lead source record associated with your account. Each item in the returned array represents a contact or organization you have tagged as a lead origin, including their contact details and billing address. You can use the returned `id` values to reference lead sources in subsequent create, update, or assign calls.
+
+## Endpoint
+
+```
+GET https://fssportal.com/api/v1/lead-source/get
+```
+
+<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+
+## Request headers
+
+<ParamField header="platform" type="string" required>
+  Must be `WEB`.
+</ParamField>
+
+<ParamField header="api-key" type="string" required>
+  Your FSS API key. Use `FSS2023`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token from your login response. Format: `Bearer {your_token}`.
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Must be `application/json`.
+</ParamField>
+
+## Request body
+
+No request body is required for this endpoint.
+
+## Response fields
+
+<ResponseField name="message" type="string">
+  A human-readable status message, e.g. `"Lead Source get successfully."`.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An array of lead source objects belonging to your account.
+  <Expandable title="Lead source object">
+    <ResponseField name="id" type="integer">
+      Unique identifier for the lead source record.
+    </ResponseField>
+    <ResponseField name="user_id" type="integer">
+      ID of the user account this lead source belongs to.
+    </ResponseField>
+    <ResponseField name="company_name" type="string">
+      Company or organization name associated with the lead source. May be empty.
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      First name of the lead source contact.
+    </ResponseField>
+    <ResponseField name="surname" type="string">
+      Last name of the lead source contact.
+    </ResponseField>
+    <ResponseField name="email" type="string">
+      Email address of the lead source contact.
+    </ResponseField>
+    <ResponseField name="phone_no" type="string">
+      Phone number of the lead source contact. May be empty.
+    </ResponseField>
+    <ResponseField name="address" type="string">
+      Street address. May be empty.
+    </ResponseField>
+    <ResponseField name="city" type="string">
+      City. May be empty.
+    </ResponseField>
+    <ResponseField name="state" type="string">
+      State or region. May be empty or `"Not Found"` if the value could not be resolved.
+    </ResponseField>
+    <ResponseField name="zip_code" type="string">
+      Postal or ZIP code. May be empty.
+    </ResponseField>
+    <ResponseField name="billing_address" type="string">
+      Billing street address. Defaults to the primary address on creation.
+    </ResponseField>
+    <ResponseField name="billing_city" type="string">
+      Billing city.
+    </ResponseField>
+    <ResponseField name="billing_state" type="string">
+      Billing state or region.
+    </ResponseField>
+    <ResponseField name="billing_zip_code" type="string">
+      Billing postal or ZIP code.
+    </ResponseField>
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of when the record was created.
+    </ResponseField>
+    <ResponseField name="updated_at" type="string">
+      ISO 8601 timestamp of the most recent update to the record.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url https://fssportal.com/api/v1/lead-source/get \
+  --header 'platform: WEB' \
+  --header 'api-key: FSS2023' \
+  --header 'Authorization: Bearer {your_token}' \
+  --header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "message": "Lead Source get successfully.",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 73,
+      "company_name": "Acme Corp",
+      "name": "Jane",
+      "surname": "Doe",
+      "email": "jane.doe@example.com",
+      "phone_no": "5551234567",
+      "address": "123 Main Street",
+      "city": "Dallas",
+      "state": "Texas",
+      "zip_code": "75201",
+      "billing_address": "123 Main Street",
+      "billing_city": "Dallas",
+      "billing_state": "Texas",
+      "billing_zip_code": "75201",
+      "created_at": "2025-01-06T10:17:04.000000Z",
+      "updated_at": "2025-04-14T15:49:16.000000Z"
+    }
+  ]
+}
+```
+
+```json 401
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

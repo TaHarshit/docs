@@ -1,0 +1,94 @@
+---
+title: "GET /room/get_category — List Room Categories"
+sidebarTitle: "Room Categories"
+description: "GET /room/get_category — Returns all room categories available in FSS Measurement. Use the returned IDs as admin_room_id when creating or updating rooms."
+---
+
+Use this endpoint to retrieve the full list of room categories available in the FSS Measurement API. Room categories define the predefined room types you can assign via `admin_room_id` when creating or updating a room. Call this endpoint to populate a selection list in your application before making a `POST /room/add` request.
+
+## Endpoint
+
+```
+GET https://fssportal.com/api/v1/room/get_category
+```
+
+## Headers
+
+| Header          | Value                  | Required |
+|-----------------|------------------------|----------|
+| `platform`      | `WEB`                  | Yes      |
+| `api-key`       | `FSS2023`              | Yes      |
+| `Authorization` | `Bearer {your_token}`  | Yes      |
+| `Content-Type`  | `application/json`     | Yes      |
+
+## Request Body
+
+This endpoint does not require a request body.
+
+## Response
+
+<ResponseField name="message" type="string">
+  A human-readable status message confirming the result of the request.
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  An array of room category objects. Each object represents one available room category.
+  <Expandable title="data item">
+    <ResponseField name="id" type="integer">
+      The unique ID of the room category. Use this value as `admin_room_id` when creating or updating a room.
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      The display name of the room category, for example `"Living Room"` or `"Bedroom"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --location 'https://fssportal.com/api/v1/room/get_category' \
+--header 'platform: WEB' \
+--header 'api-key: FSS2023' \
+--header 'Authorization: Bearer {your_token}' \
+--header 'Content-Type: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200 Success
+{
+  "message": "Room categories get successfully.",
+  "data": [
+    {
+      "id": 1,
+      "name": "Living Room"
+    },
+    {
+      "id": 2,
+      "name": "Kitchen"
+    },
+    {
+      "id": 3,
+      "name": "Dining Room"
+    },
+    {
+      "id": 4,
+      "name": "Bedroom"
+    },
+    {
+      "id": 5,
+      "name": "Master Bedroom"
+    }
+  ]
+}
+```
+
+```json 401 Unauthorized
+{
+  "message": "Unauthenticated."
+}
+```
+
+</ResponseExample>

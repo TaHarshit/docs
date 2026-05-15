@@ -1,0 +1,130 @@
+---
+title: "FSS Measurement API Reference Overview"
+description: "Overview of the FSS Measurement REST API: base URL, required authentication headers, JSON request and response format, pagination, and rate limits."
+---
+
+The FSS Measurement API is a RESTful HTTP API that lets you manage window measurements, clients, rooms, and subscriptions. Every request must include two required headers — `api-key` and `platform` — and all data is exchanged as JSON (except file uploads, which use `multipart/form-data`).
+
+## Base URL
+
+All endpoints are relative to the following base URL:
+
+```
+https://fssportal.com/api/v1
+```
+
+## Required headers
+
+Every request to the API must include the following headers:
+
+| Header | Value | Required |
+|---|---|---|
+| `api-key` | `FSS2023` | Yes |
+| `platform` | `WEB`, `IOS`, or `ANDROID` | Yes |
+| `Content-Type` | `application/json` (or `multipart/form-data` for file uploads) | Yes |
+| `Accept` | `application/json` | Yes |
+| `Authorization` | `Bearer {api_token}` (required on authenticated endpoints) | Conditional |
+
+<Note>
+  The `Authorization` header is required on all endpoints that return user-specific data. You receive an `api_token` after a successful sign-in or sign-up request.
+</Note>
+
+## Request format
+
+Send request bodies as JSON. Set `Content-Type: application/json` on all non-file requests:
+
+```json
+{
+  "parameter1": "value1",
+  "parameter2": "value2"
+}
+```
+
+## Response format
+
+All responses return JSON. Successful responses include a `message` string and a `data` object:
+
+```json
+{
+  "message": "Operation successful",
+  "data": {
+    "id": 123,
+    "name": "John Doe"
+  }
+}
+```
+
+Error responses include a `message` and, for validation failures, a field-keyed `errors` object:
+
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["The email field is required."],
+    "password": ["The password must be at least 8 characters."]
+  },
+  "status": 422
+}
+```
+
+## Pagination
+
+List endpoints return paginated results using the following shape:
+
+```json
+{
+  "data": [],
+  "current_page": 1,
+  "per_page": 15,
+  "total": 100,
+  "last_page": 7
+}
+```
+
+Pass `?page=2` as a query parameter to retrieve subsequent pages.
+
+## Rate limiting
+
+The API enforces a limit of **60 requests per minute per user**. When you exceed this limit, the API responds with `429 Too Many Requests`. Inspect the response headers to determine when you can retry:
+
+| Header | Description |
+|---|---|
+| `X-RateLimit-Limit` | Maximum requests allowed per window |
+| `X-RateLimit-Remaining` | Requests remaining in the current window |
+| `Retry-After` | Seconds to wait before retrying |
+
+<Tip>
+  Implement exponential backoff in your integration and cache GET responses where possible to stay within rate limits.
+</Tip>
+
+## HTTP status codes
+
+| Code | Status | Meaning |
+|---|---|---|
+| `200` | OK | Request succeeded |
+| `201` | Created | Resource created successfully |
+| `400` | Bad Request | Invalid request format or parameters |
+| `401` | Unauthorized | Missing or invalid authentication token |
+| `403` | Forbidden | Valid token but insufficient permissions or no active subscription |
+| `404` | Not Found | Resource does not exist |
+| `422` | Unprocessable Entity | Validation errors on request body fields |
+| `429` | Too Many Requests | Rate limit exceeded |
+| `500` | Internal Server Error | Unexpected server-side error |
+| `503` | Service Unavailable | API temporarily unavailable |
+
+## File uploads
+
+Endpoints that accept a file (such as `profile_image`) require `multipart/form-data` encoding instead of JSON. Omit the `Content-Type: application/json` header and let your HTTP client set the boundary automatically:
+
+```bash
+curl --location 'https://fssportal.com/api/v1/user/signup' \
+  --header 'api-key: FSS2023' \
+  --header 'platform: WEB' \
+  --form 'name="John Doe"' \
+  --form 'email="john@example.com"' \
+  --form 'profile_image=@"/path/to/image.jpg"'
+```
+
+<Note>
+  When no file is included in a request, send the body as `application/json`. Only switch to `multipart/form-data` when uploading a file.
+</Note>

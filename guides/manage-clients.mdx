@@ -1,0 +1,316 @@
+---
+title: "Manage Clients with the FSS Measurement API"
+description: "Learn how to create, update, search, and delete client records using the FSS Measurement API, including full request and response examples."
+---
+
+Clients are the top-level records in the FSS Measurement API — every room and measurement you create must belong to a client. This guide walks you through creating, listing, searching, updating, and deleting client records, with curl and JavaScript examples for each operation.
+
+## Creating a client
+
+Use `POST /client/add` to create a new client record. The `name`, `surname`, and `email` fields are required. All address fields are optional but recommended for complete records.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/client/add \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane",
+    "surname": "Smith",
+    "email": "jane.smith@example.com",
+    "phone": "5551234567",
+    "address": "742 Evergreen Terrace",
+    "city": "Springfield",
+    "state": "IL",
+    "zip_code": "62701",
+    "billing_address": "742 Evergreen Terrace",
+    "billing_city": "Springfield",
+    "billing_state": "IL",
+    "billing_zip_code": "62701",
+    "phone_no": "5551234567",
+    "lead_source_id": 17,
+    "project_name": "Main Floor Windows",
+    "end_client_known": true
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/client/add', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: 'Jane',
+    surname: 'Smith',
+    email: 'jane.smith@example.com',
+    phone: '5551234567',
+    address: '742 Evergreen Terrace',
+    city: 'Springfield',
+    state: 'IL',
+    zip_code: '62701',
+    billing_address: '742 Evergreen Terrace',
+    billing_city: 'Springfield',
+    billing_state: 'IL',
+    billing_zip_code: '62701',
+    phone_no: '5551234567',
+    lead_source_id: 17,
+    project_name: 'Main Floor Windows',
+    end_client_known: true
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+A successful response returns a confirmation message:
+
+```json
+{
+  "message": "Client added successfully.",
+  "data": []
+}
+```
+
+<Note>
+Associate a `lead_source_id` when creating clients to track which marketing channel or referral source brought them to you. Retrieve available lead sources from [`GET /lead-source/get`](/api-reference/lead-source/get) before creating your first client. See the [Lead Sources API reference](/api-reference/lead-source/get) for details.
+</Note>
+
+## Listing clients
+
+Use `POST /client/list` to retrieve a paginated list of your clients. You can optionally filter by keyword and control the page size.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/client/list \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "keyword": "",
+    "page": 1,
+    "limit": 20
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/client/list', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    keyword: '',
+    page: 1,
+    limit: 20
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+The response wraps a standard pagination envelope around an array of client objects:
+
+```json
+{
+  "message": "Client get successfully.",
+  "data": {
+    "current_page": 1,
+    "per_page": 20,
+    "total": 3,
+    "last_page": 1,
+    "data": [
+      {
+        "id": 1475,
+        "user_id": 68,
+        "name": "Test",
+        "surname": "Convert Quick Quote",
+        "email": "test@gmail.com",
+        "phone_no": "8460008773",
+        "lead_source_name": "Snv Rtr",
+        "lead_source_email": "ddddnv@gmail.com",
+        "created_at": "2025-12-16T05:33:32.000000Z"
+      }
+    ],
+    "next_page_url": null,
+    "prev_page_url": null
+  }
+}
+```
+
+Use `current_page`, `last_page`, and `next_page_url` to iterate through all pages. When `next_page_url` is `null`, you have reached the last page.
+
+## Searching clients
+
+Use `POST /client/search` to find clients by a keyword. The search matches against name, email, and other contact fields.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/client/search \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "keyword": "jane"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/client/search', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ keyword: 'jane' })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+The response uses the same paginated format as the list endpoint.
+
+## Updating a client
+
+Use `POST /client/update` to modify an existing client record. You must include the `client_id` of the record you want to update along with any fields you want to change.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/client/update \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": 1475,
+    "name": "Jane",
+    "surname": "Smith",
+    "email": "jane.smith@example.com",
+    "phone_no": "5559876543",
+    "address": "742 Evergreen Terrace",
+    "city": "Springfield",
+    "state": "IL",
+    "zip_code": "62701"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/client/update', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    client_id: 1475,
+    name: 'Jane',
+    surname: 'Smith',
+    email: 'jane.smith@example.com',
+    phone_no: '5559876543',
+    address: '742 Evergreen Terrace',
+    city: 'Springfield',
+    state: 'IL',
+    zip_code: '62701'
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+```json
+{
+  "message": "Client details updated successfully.",
+  "data": []
+}
+```
+
+## Deleting a client
+
+Use `POST /client/delete` to permanently remove a client record. This action cannot be undone.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/client/delete \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": 1475
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/client/delete', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ client_id: 1475 })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+```json
+{
+  "message": "Client deleted successfully.",
+  "data": []
+}
+```
+
+<Warning>
+Deleting a client also removes associated rooms and measurements. Retrieve and archive any data you need before calling this endpoint.
+</Warning>
+
+## Getting clients shared by your company
+
+Use `POST /client/user-client` to retrieve clients belonging to other members of your company. Pass the `company_name` of the organization whose clients you want to access. The response uses the same paginated format as the list endpoint.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/client/user_client \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "company_name": "Acme Windows"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/client/user_client', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ company_name: 'Acme Windows' })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+## API reference
+
+- [`POST /client/add`](/api-reference/client/add) — Create a client
+- [`POST /client/list`](/api-reference/client/list) — List clients with pagination
+- [`POST /client/search`](/api-reference/client/search) — Search clients by keyword
+- [`POST /client/update`](/api-reference/client/update) — Update a client
+- [`POST /client/delete`](/api-reference/client/delete) — Delete a client
+- [`POST /client/user-client`](/api-reference/client/user-client) — List clients from company members
+- [`GET /lead-source/get`](/api-reference/lead-source/get) — Retrieve available lead sources

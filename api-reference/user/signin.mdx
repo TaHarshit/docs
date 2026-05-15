@@ -1,0 +1,98 @@
+---
+title: "POST /user/signin — Authenticate and Get Token"
+sidebarTitle: "Sign In"
+description: "POST /user/signin — Authenticate with email and password. Returns an API Bearer token to use in subsequent authenticated requests."
+---
+
+Use this endpoint to authenticate an existing user with their email and password. A successful response includes an `api_token` that you must include as a Bearer token in the `Authorization` header on all subsequent authenticated requests.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/user/signin
+```
+
+## Request headers
+
+| Header | Value | Required |
+|---|---|---|
+| `api-key` | `FSS2023` | Yes |
+| `platform` | `WEB`, `IOS`, or `ANDROID` | Yes |
+| `Content-Type` | `application/json` | Yes |
+
+## Request body
+
+<ParamField body="email" type="string" required>
+  The registered email address for the account.
+</ParamField>
+
+<ParamField body="password" type="string" required>
+  The account password.
+</ParamField>
+
+<ParamField body="device_token" type="string">
+  A push-notification device token. Optional, but recommended for mobile clients to receive notifications.
+</ParamField>
+
+<ParamField body="platform" type="string" required>
+  The client platform: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+## Example request
+
+```bash
+curl --location 'https://fssportal.com/api/v1/user/signin' \
+  --header 'api-key: FSS2023' \
+  --header 'platform: WEB' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+    "email": "john.doe@example.com",
+    "password": "SecurePass123",
+    "device_token": "",
+    "platform": "WEB"
+  }'
+```
+
+## Success response — 200 OK
+
+```json
+{
+  "message": "Login successful",
+  "data": {
+    "api_token": "abc123def456ghi789jkl012mno345pqr678stu901vwx234yz",
+    "user": {
+      "id": 123,
+      "user_type": 2,
+      "company_name": "176218755",
+      "own_company_name": "Doe Window Treatments",
+      "name": "John Doe",
+      "country_code": "+1",
+      "phone_no": "9173304645",
+      "profile_image": "https://fss-measurement-bucket.s3.amazonaws.com/profile_image/123.jpg",
+      "email": "john.doe@example.com",
+      "status": 1,
+      "company_owner": 1,
+      "solatech_focus_on": 0
+    }
+  }
+}
+```
+
+<Tip>
+  Store the `api_token` securely after sign-in. Use it in the `Authorization: Bearer {api_token}` header on all subsequent requests that require authentication.
+</Tip>
+
+## Error response — 401 Invalid credentials
+
+The API returns `401` when the email or password is incorrect:
+
+```json
+{
+  "message": "Invalid email or password.",
+  "status": 401
+}
+```
+
+<Warning>
+  The account must be active (`status: 1`) to sign in. Deactivated accounts receive a `403` response. Contact support if you believe your account has been deactivated in error.
+</Warning>

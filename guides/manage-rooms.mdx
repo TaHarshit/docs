@@ -1,0 +1,302 @@
+---
+title: "Organize Projects with Rooms"
+description: "Learn how to create, update, and retrieve rooms to organize window measurements within client projects using the FSS Measurement API."
+---
+
+Rooms belong to clients and serve as the organizing unit for window measurements. Each room represents a named space in a client's project — such as "Living Room", "Master Bedroom", or "Kitchen" — and every measurement you record is attached to a specific room. Before creating a room, you need an existing client. Before recording a measurement, you need an existing room.
+
+## Creating a room
+
+Use `POST /room/add` to create a new room for a client. You must provide the `client_id` of the client this room belongs to and an `admin_room_id` that maps to a predefined room category. Use `GET /room/get-category` to retrieve valid category IDs.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/room/add \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": 1856,
+    "admin_room_id": 4,
+    "name": "Living Room"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/room/add', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    client_id: 1856,
+    admin_room_id: 4,
+    name: 'Living Room'
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+The response returns the new room's ID. Save this value — you need it when creating measurements.
+
+```json
+{
+  "message": "Room added successfully.",
+  "data": {
+    "id": 4945
+  }
+}
+```
+
+## Updating a room
+
+Use `POST /room/update` to rename an existing room. Pass the `room_id` of the room you want to update and the new `name`.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/room/update \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "room_id": 4945,
+    "name": "Main Living Room"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/room/update', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    room_id: 4945,
+    name: 'Main Living Room'
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+```json
+{
+  "message": "Room updated successfully.",
+  "data": []
+}
+```
+
+## Getting rooms for a client
+
+Use `POST /room/get-by-client-id` to retrieve all rooms belonging to a specific client. This is useful for building a room picker in your application before recording measurements.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/room/get-by-client-id \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": 1856
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/room/get-by-client-id', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ client_id: 1856 })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+## Getting a single room with its measurements
+
+Use `POST /room/get` to retrieve a specific room and the measurements it contains. Pass both `client_id` and `room_id`. The response lists each measurement group in the room with its type, name, and timestamps.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/room/get \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": 1856,
+    "room_id": 4945
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/room/get', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    client_id: 1856,
+    room_id: 4945
+  })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+```json
+{
+  "message": "Rooms get successfully.",
+  "data": [
+    {
+      "room_id": 4945,
+      "measurement_type_id": 1,
+      "measurement_type_name": "Single Window Form",
+      "measurement_id": 12170,
+      "group_id": 11157,
+      "window_name": "Front Left",
+      "created_at": "2026-05-14T12:01:04.000000Z"
+    },
+    {
+      "room_id": 4945,
+      "measurement_type_id": 1,
+      "measurement_type_name": "Single Window Form",
+      "measurement_id": 12171,
+      "group_id": 11158,
+      "window_name": "Front Right",
+      "created_at": "2026-05-14T12:30:36.000000Z"
+    }
+  ]
+}
+```
+
+## Getting room categories
+
+Use `POST /room/get-category` to retrieve the list of predefined room categories. The `id` from this response is the `admin_room_id` you pass when creating a room.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/room/get-category \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/room/get-category', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+## Getting available measurement types
+
+Use `POST /room/measurement_type` to retrieve the measurement types that can be assigned to a room. The `id` from this response corresponds to the `measurement_type_id` field used when fetching measurements.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/room/measurement_type \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/room/measurement_type', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+```json
+{
+  "message": "Measurement type get successfully.",
+  "data": [
+    { "id": 2, "name": "Single Window" },
+    { "id": 3, "name": "Multi Window" },
+    { "id": 4, "name": "Specialty Window" },
+    { "id": 5, "name": "Windows in Series with Draperies" }
+  ]
+}
+```
+
+## Deleting a room
+
+Use `POST /room/delete` to permanently remove a room. Pass the `room_id` of the room to delete.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://fssportal.com/api/v1/room/delete \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "room_id": 4945
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://fssportal.com/api/v1/room/delete', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ room_id: 4945 })
+});
+
+const data = await response.json();
+```
+
+</CodeGroup>
+
+<Warning>
+Deleting a room permanently removes all measurements attached to it. Retrieve measurement data before deleting a room if you need to preserve it.
+</Warning>
+
+<Tip>
+For large projects with many windows, organize rooms by floor or area — for example, "First Floor - Living Room" and "First Floor - Dining Room" — rather than just by room name. This makes it easier to navigate and export measurements later.
+</Tip>
+
+## Next steps
+
+Once your rooms are set up, record window measurements for them. See [Record Window Measurements via the API](/guides/record-measurements) for a step-by-step walkthrough.
+
+## API reference
+
+- [`POST /room/add`](/api-reference/room/add) — Create a room
+- [`POST /room/update`](/api-reference/room/update) — Update a room
+- [`POST /room/get-by-client-id`](/api-reference/room/get-by-client-id) — List all rooms for a client
+- [`POST /room/get`](/api-reference/room/get) — Get a room and its measurements
+- [`POST /room/get-category`](/api-reference/room/get-category) — List room categories
+- [`POST /room/measurement_type`](/api-reference/room/measurement-type) — List available measurement types
+- [`POST /room/delete`](/api-reference/room/delete) — Delete a room

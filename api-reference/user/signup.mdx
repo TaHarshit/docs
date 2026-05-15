@@ -1,0 +1,140 @@
+---
+title: "POST /user/signup — Create New Account"
+sidebarTitle: "Sign Up"
+description: "POST /user/signup — Register a new user account. Accepts name, email, password, and optional profile image. Returns user data and API token."
+---
+
+Use this endpoint to register a new user account. On success, the API returns a user object and an `api_token` you can use immediately for authenticated requests — no separate sign-in step is required.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/user/signup
+```
+
+## Request headers
+
+| Header | Value | Required |
+|---|---|---|
+| `api-key` | `FSS2023` | Yes |
+| `platform` | `WEB`, `IOS`, or `ANDROID` | Yes |
+| `Content-Type` | `multipart/form-data` (when uploading a profile image) or `application/json` | Yes |
+
+<Note>
+  When you include a `profile_image` file, you must send the entire request as `multipart/form-data`. All other fields are submitted as form parts rather than JSON properties. When no file is included, you can use `application/json`.
+</Note>
+
+## Request body
+
+<ParamField body="name" type="string" required>
+  The user's full name.
+</ParamField>
+
+<ParamField body="email" type="string" required>
+  A unique, valid email address. The API rejects duplicate addresses with a `422` error.
+</ParamField>
+
+<ParamField body="password" type="string" required>
+  The account password. Must be at least 8 characters.
+</ParamField>
+
+<ParamField body="password_confirmation" type="string" required>
+  Must exactly match the value of `password`.
+</ParamField>
+
+<ParamField body="phone" type="string">
+  The user's phone number (digits only, without country code).
+</ParamField>
+
+<ParamField body="profile_image" type="file">
+  An optional profile photo. Accepted formats: JPEG, PNG, GIF. When provided, the request must use `multipart/form-data`.
+</ParamField>
+
+<ParamField body="company_name" type="string">
+  The ID of an existing company to join. Required when `reg_as_company` is `0`.
+</ParamField>
+
+<ParamField body="reg_as_company" type="integer" required>
+  Set to `1` to create a new independent company, or `0` to join an existing one.
+</ParamField>
+
+<ParamField body="own_company_name" type="string">
+  The display name for your new company. Required when `reg_as_company` is `1`.
+</ParamField>
+
+<ParamField body="country_code" type="string">
+  The dialing code for the phone number — for example, `1` for the US or `91` for India.
+</ParamField>
+
+<ParamField body="device_token" type="string">
+  A push-notification device token. Optional, but recommended for mobile clients.
+</ParamField>
+
+<ParamField body="platform" type="string" required>
+  The client platform: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+## Example request
+
+```bash
+curl --location 'https://fssportal.com/api/v1/user/signup' \
+  --header 'api-key: FSS2023' \
+  --header 'platform: WEB' \
+  --form 'name="John Doe"' \
+  --form 'email="john.doe@example.com"' \
+  --form 'password="SecurePass123"' \
+  --form 'password_confirmation="SecurePass123"' \
+  --form 'country_code="1"' \
+  --form 'phone="9173304645"' \
+  --form 'reg_as_company="1"' \
+  --form 'own_company_name="Doe Window Treatments"' \
+  --form 'platform="WEB"'
+```
+
+## Success response — 201 Created
+
+```json
+{
+  "message": "User registered successfully",
+  "data": {
+    "api_token": "abc123def456ghi789jkl012mno345pqr678stu901vwx234yz",
+    "user": {
+      "id": 123,
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "phone_no": "9173304645",
+      "country_code": "+1",
+      "profile_image": "https://fss-measurement-bucket.s3.amazonaws.com/profile_image/123.jpg",
+      "company_name": "176218755",
+      "own_company_name": "Doe Window Treatments",
+      "user_type": 2,
+      "status": 1,
+      "company_owner": 1,
+      "created_at": "2024-04-29T09:24:00.000000Z"
+    }
+  }
+}
+```
+
+<Tip>
+  Store the returned `api_token` securely (for example, in an encrypted keychain or secure storage). Pass it as `Authorization: Bearer {api_token}` on all subsequent authenticated requests.
+</Tip>
+
+## Error response — 422 Validation error
+
+The API returns a `422` status with a field-keyed `errors` object when validation fails:
+
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": [
+      "The email has already been taken."
+    ],
+    "password": [
+      "The password must be at least 8 characters."
+    ]
+  },
+  "status": 422
+}
+```

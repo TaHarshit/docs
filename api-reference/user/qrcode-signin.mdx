@@ -1,0 +1,106 @@
+---
+title: "POST /user/qrcode_signin — QR Code Authentication"
+sidebarTitle: "QR Sign In"
+description: "POST /user/qrcode_signin — Authenticate using a QR code scan. Accepts a QR code value and returns an API token for the matched user."
+---
+
+QR code sign-in allows users to authenticate by scanning a code generated from an active session on another device. This is useful for quickly onboarding a new device without typing credentials. Send the scanned QR code value to this endpoint and, on success, the API returns a valid `api_token` for the associated account.
+
+## Endpoint
+
+```
+POST https://fssportal.com/api/v1/user/qrcode_signin
+```
+
+## Request headers
+
+| Header | Value | Required |
+|---|---|---|
+| `api-key` | `FSS2023` | Yes |
+| `platform` | `WEB`, `IOS`, or `ANDROID` | Yes |
+| `Content-Type` | `application/json` | Yes |
+
+## Request body
+
+<ParamField body="qr_code" type="string" required>
+  The raw data string extracted from the scanned QR code. QR codes are single-use and expire after a short validity window.
+</ParamField>
+
+<ParamField body="device_token" type="string">
+  A push-notification device token for the new device. Optional, but recommended to receive notifications on the newly authenticated device.
+</ParamField>
+
+<ParamField body="platform" type="string" required>
+  The client platform: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+## Example request
+
+```bash
+curl --location 'https://fssportal.com/api/v1/user/qrcode_signin' \
+  --header 'api-key: FSS2023' \
+  --header 'platform: WEB' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+    "qr_code": "QR_CODE_DATA_HERE",
+    "device_token": "",
+    "platform": "WEB"
+  }'
+```
+
+## Success response — 200 OK
+
+```json
+{
+  "message": "QR code authentication successful",
+  "data": {
+    "api_token": "abc123def456ghi789jkl012mno345pqr678stu901vwx234yz",
+    "user": {
+      "id": 123,
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "phone_no": "9173304645",
+      "profile_image": "https://fss-measurement-bucket.s3.amazonaws.com/profile_image/123.jpg",
+      "company_name": "176218755",
+      "own_company_name": "Doe Window Treatments",
+      "status": 1
+    }
+  }
+}
+```
+
+<Tip>
+  Store the returned `api_token` securely on the new device. Use it in the `Authorization: Bearer {api_token}` header on all subsequent authenticated requests.
+</Tip>
+
+## Error response — 401 Invalid QR code
+
+The API returns `401` when the QR code is invalid, already used, or has expired:
+
+```json
+{
+  "message": "Invalid or expired QR code.",
+  "status": 401
+}
+```
+
+## QR code authentication flow
+
+<Steps>
+  <Step title="Generate a QR code">
+    On an already-authenticated device, generate a QR code from the user's active session.
+  </Step>
+  <Step title="Scan the QR code">
+    The new device's camera scans the QR code and extracts the encoded data string.
+  </Step>
+  <Step title="Submit the QR code">
+    Send the extracted string as the `qr_code` field in a POST request to this endpoint.
+  </Step>
+  <Step title="Receive an API token">
+    On success, the API returns an `api_token` tied to the account. Use it for all further requests from the new device.
+  </Step>
+</Steps>
+
+<Warning>
+  Each QR code can only be used once. If authentication fails due to an expired or already-used code, the user must generate a new QR code from their authenticated device and retry.
+</Warning>
