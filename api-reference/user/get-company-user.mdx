@@ -1,80 +1,87 @@
 ---
-title: "GET /user/get_company_user — List Team Members"
-sidebarTitle: "Company Users"
-description: "GET /user/get_company_user — Returns all team members in your company account, including their profile and role details. Useful for collaboration features."
+title: Get Company Users
+api: 'POST /api/v1/user/get_company_user'
+description: Get all users in your company
 ---
-
-Use this endpoint to retrieve all members of your company account. This is useful for team collaboration features such as assigning jobs, managing permissions, or displaying a list of colleagues within your FSS Measurement organization.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/user/get_company_user
+POST /api/v1/user/get_company_user
 ```
 
-<Note>
-  The source API uses `POST` for this endpoint. No request body is required.
-</Note>
+<Note>This endpoint requires authentication</Note>
 
-## Required headers
 
-| Header          | Value                 |
-| --------------- | --------------------- |
-| `platform`      | `WEB`                 |
-| `api-key`       | `FSS2023`             |
-| `Authorization` | `Bearer {your_token}` |
-| `Content-Type`  | `application/json`    |
 
-## Request body
+## Headers
 
-No request body is required for this endpoint.
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
-## Response fields
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
+## Request Body
+
+No request body required.
+
+## Response
 
 <ResponseField name="message" type="string">
-  A human-readable status message, e.g. `"Success."`.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="array">
-  Array of user objects belonging to your company.
-
-  <Expandable title="data item properties">
+  data
+  <Expandable title="data item">
     <ResponseField name="id" type="integer">
-      Unique numeric identifier for the team member.
+      id
     </ResponseField>
     <ResponseField name="name" type="string">
-      The team member's full name.
+      name
     </ResponseField>
-    <ResponseField name="email" type="string">
-      The team member's email address.
-    </ResponseField>
-    <ResponseField name="phone_no" type="string | null">
-      The team member's phone number, or `null` if not set.
+    <ResponseField name="phone_no" type="object">
+      phone no
     </ResponseField>
     <ResponseField name="profile_image" type="string">
-      URL to the team member's profile image.
+      profile image
     </ResponseField>
-  </Expandable>
+    <ResponseField name="email" type="string">
+      email
+    </ResponseField>  </Expandable>
 </ResponseField>
-
-## Example
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/user/get_company_user \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json'
+curl --location 'http://fssportal.com/api/v1/user/get_company_user' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/user/get_company_user', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "message": "Success.",
   "data": [
@@ -82,25 +89,30 @@ curl --request POST \
       "id": 717,
       "name": "Nathan Eldridge iPhone",
       "phone_no": null,
-      "profile_image": "https://fssportal.com/uploads/profile_image/",
-      "email": "nathan@example.com"
+      "profile_image": "http://localhost/fss/public/uploads/profile_image/",
+      "email": "netest26@test.com"
     },
     {
       "id": 718,
       "name": "Nathan Eldridge iPad",
       "phone_no": null,
-      "profile_image": "https://fssportal.com/uploads/profile_image/",
-      "email": "nathanipad@example.com"
+      "profile_image": "http://localhost/fss/public/uploads/profile_image/",
+      "email": "ipadtest26@test.com"
     },
     {
       "id": 719,
       "name": "Kelly Eldridge iPhone",
       "phone_no": null,
-      "profile_image": "https://fssportal.com/uploads/profile_image/",
-      "email": "kelly@example.com"
+      "profile_image": "http://localhost/fss/public/uploads/profile_image/",
+      "email": "ketest26@test.com"
     }
   ]
 }
 ```
 
 </ResponseExample>
+
+## Notes
+
+- Authentication is required
+

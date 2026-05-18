@@ -1,37 +1,99 @@
 ---
-title: "FSS Measurement API Reference Overview"
-description: "Overview of the FSS Measurement REST API: base URL, required authentication headers, JSON request and response format, pagination, and rate limits."
+title: 'API Overview'
+description: 'Overview of the FSS Measurement API'
 ---
 
-The FSS Measurement API is a RESTful HTTP API that lets you manage window measurements, clients, rooms, and subscriptions. Every request must include two required headers — `api-key` and `platform` — and all data is exchanged as JSON (except file uploads, which use `multipart/form-data`).
+## Introduction
+
+The FSS Measurement API is a RESTful API that provides comprehensive functionality for managing window measurements, clients, rooms, and subscriptions. Built on Laravel, it offers robust authentication, data validation, and error handling.
 
 ## Base URL
 
-All endpoints are relative to the following base URL:
-
 ```
-https://fssportal.com/api/v1
+http://fssportal.com/api/v1
 ```
 
-## Required headers
+## API Characteristics
 
-Every request to the API must include the following headers:
+<CardGroup cols={2}>
+  <Card title="RESTful Design" icon="code">
+    Follows REST principles with standard HTTP methods (GET, POST, PUT, DELETE)
+  </Card>
+  <Card title="JSON Format" icon="brackets-curly">
+    All requests and responses use JSON format
+  </Card>
+  <Card title="Rate Limited" icon="gauge">
+    60 requests per minute per user
+  </Card>
+  <Card title="Secure" icon="shield">
+    HTTPS only with Bearer token authentication
+  </Card>
+</CardGroup>
 
-| Header | Value | Required |
-|---|---|---|
-| `api-key` | `FSS2023` | Yes |
-| `platform` | `WEB`, `IOS`, or `ANDROID` | Yes |
-| `Content-Type` | `application/json` (or `multipart/form-data` for file uploads) | Yes |
-| `Accept` | `application/json` | Yes |
-| `Authorization` | `Bearer {api_token}` (required on authenticated endpoints) | Conditional |
+## API Modules
 
-<Note>
-  The `Authorization` header is required on all endpoints that return user-specific data. You receive an `api_token` after a successful sign-in or sign-up request.
-</Note>
+### User Management
+Complete user lifecycle management including registration, authentication, profile management, and team collaboration.
 
-## Request format
+**Key Features:**
+- User signup and signin
+- QR code authentication
+- Password reset functionality
+- Profile management
+- Company and team management
+- Custom field ordering
 
-Send request bodies as JSON. Set `Content-Type: application/json` on all non-file requests:
+### Client Management
+Manage client information, projects, and contact details.
+
+**Key Features:**
+- Add, update, and delete clients
+- Search clients by keyword
+- Client listing with pagination
+- Lead source tracking
+- Project management
+
+### Room Management
+Organize measurements by rooms within client projects.
+
+**Key Features:**
+- Add and manage rooms
+- Room categorization
+- Measurement type assignment
+- Room-based measurement retrieval
+
+### Measurements
+Comprehensive measurement tools for various window types.
+
+**Supported Types:**
+- Single Window
+- Single Window with Photo
+- Multiple Windows
+- Specialty Windows
+- Series Windows with Draperies
+- Awnings
+
+### Subscriptions & Payments
+Stripe-integrated subscription management.
+
+**Features:**
+- Payment initialization
+- Payment completion
+- Subscription status checking
+- Plan management
+
+### Settings & Configuration
+Application settings and reference data.
+
+**Includes:**
+- Countries list
+- How it works content
+- Lead sources
+- Admin room templates
+
+## Request Format
+
+All POST requests should include:
 
 ```json
 {
@@ -40,40 +102,61 @@ Send request bodies as JSON. Set `Content-Type: application/json` on all non-fil
 }
 ```
 
-## Response format
+### Headers
 
-All responses return JSON. Successful responses include a `message` string and a `data` object:
+Authentication is handled globally in the API playground via the `X-API-Token` header.
 
+```
+X-API-Token: YOUR_API_TOKEN
+platform: WEB, IOS, or ANDROID
+Content-Type: application/json
+Accept: application/json
+```
+
+## Response Format
+
+### Success Response
 ```json
 {
   "message": "Operation successful",
   "data": {
-    "id": 123,
-    "name": "John Doe"
+    // Response data
   }
 }
 ```
 
-Error responses include a `message` and, for validation failures, a field-keyed `errors` object:
-
+### Error Response
 ```json
 {
-  "message": "The given data was invalid.",
+  "message": "Error description",
   "errors": {
-    "email": ["The email field is required."],
-    "password": ["The password must be at least 8 characters."]
+    "field": ["Error message"]
   },
-  "status": 422
+  "status": 400
 }
 ```
 
+## HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 422 | Validation Error |
+| 429 | Too Many Requests |
+| 500 | Internal Server Error |
+
 ## Pagination
 
-List endpoints return paginated results using the following shape:
+List endpoints support pagination:
 
 ```json
 {
-  "data": [],
+  "data": [...],
   "current_page": 1,
   "per_page": 15,
   "total": 100,
@@ -81,50 +164,53 @@ List endpoints return paginated results using the following shape:
 }
 ```
 
-Pass `?page=2` as a query parameter to retrieve subsequent pages.
+## File Uploads
 
-## Rate limiting
-
-The API enforces a limit of **60 requests per minute per user**. When you exceed this limit, the API responds with `429 Too Many Requests`. Inspect the response headers to determine when you can retry:
-
-| Header | Description |
-|---|---|
-| `X-RateLimit-Limit` | Maximum requests allowed per window |
-| `X-RateLimit-Remaining` | Requests remaining in the current window |
-| `Retry-After` | Seconds to wait before retrying |
-
-<Tip>
-  Implement exponential backoff in your integration and cache GET responses where possible to stay within rate limits.
-</Tip>
-
-## HTTP status codes
-
-| Code | Status | Meaning |
-|---|---|---|
-| `200` | OK | Request succeeded |
-| `201` | Created | Resource created successfully |
-| `400` | Bad Request | Invalid request format or parameters |
-| `401` | Unauthorized | Missing or invalid authentication token |
-| `403` | Forbidden | Valid token but insufficient permissions or no active subscription |
-| `404` | Not Found | Resource does not exist |
-| `422` | Unprocessable Entity | Validation errors on request body fields |
-| `429` | Too Many Requests | Rate limit exceeded |
-| `500` | Internal Server Error | Unexpected server-side error |
-| `503` | Service Unavailable | API temporarily unavailable |
-
-## File uploads
-
-Endpoints that accept a file (such as `profile_image`) require `multipart/form-data` encoding instead of JSON. Omit the `Content-Type: application/json` header and let your HTTP client set the boundary automatically:
+File uploads use `multipart/form-data`:
 
 ```bash
-curl --location 'https://fssportal.com/api/v1/user/signup' \
-  --header 'api-key: FSS2023' \
-  --header 'platform: WEB' \
-  --form 'name="John Doe"' \
-  --form 'email="john@example.com"' \
-  --form 'profile_image=@"/path/to/image.jpg"'
+curl --location 'http://fssportal.com/api/v1/user/signup' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--form 'name="John Doe"' \
+--form 'email="john@example.com"' \
+--form 'profile_image=@"/path/to/image.jpg"'
 ```
 
-<Note>
-  When no file is included in a request, send the body as `application/json`. Only switch to `multipart/form-data` when uploading a file.
-</Note>
+## Rate Limiting
+
+- **Limit**: 60 requests per minute per user
+- **Headers**: 
+  - `X-RateLimit-Limit`: Maximum requests
+  - `X-RateLimit-Remaining`: Remaining requests
+
+## Versioning
+
+Currently on version 1. Future versions will be indicated in the URL path:
+```
+/api/v2/endpoint
+```
+
+## SDKs and Libraries
+
+<CardGroup cols={3}>
+  <Card title="JavaScript" icon="js">
+    Native fetch API examples provided
+  </Card>
+  <Card title="Python" icon="python">
+    Requests library examples
+  </Card>
+  <Card title="PHP" icon="php">
+    cURL examples for Laravel integration
+  </Card>
+</CardGroup>
+
+## Testing
+
+Use the Postman collection included in your project:
+- `FSS Measurement Copy.postman_collection.json`
+
+## Support
+
+- **Documentation**: https://docs.fss-measurement.com
+- **Email**: support@fss-measurement.com
+- **Status**: https://status.fss-measurement.com

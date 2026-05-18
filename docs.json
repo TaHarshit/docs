@@ -1,17 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "luma",
-  "name": "FSS Measurement API",
+  "theme": "mint",
+  "name": "FSS API v1 Documentation",
   "colors": {
-    "primary": "#0D9373",
-    "light": "#07C983",
-    "dark": "#0D9373"
-  },
-  "navbar": {
-    "primary": {
-      "type": "github",
-      "href": "https://github.com/fss-measurement"
-    }
+    "primary": "#0A8F5A",
+    "light": "#65C18C",
+    "dark": "#074A30"
   },
   "navigation": {
     "tabs": [
@@ -19,26 +13,9 @@
         "tab": "Documentation",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Getting Started",
             "pages": [
-              "introduction",
-              "quickstart",
-              "authentication"
-            ]
-          },
-          {
-            "group": "Core Concepts",
-            "pages": [
-              "concepts/data-model",
-              "concepts/subscriptions"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/manage-clients",
-              "guides/record-measurements",
-              "guides/manage-rooms"
+              "introduction"
             ]
           }
         ]
@@ -47,62 +24,40 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "Overview",
-            "pages": [
-              "api-reference/overview",
-              "api-reference/errors"
-            ]
-          },
-          {
-            "group": "Authentication",
-            "pages": [
-              "api-reference/user/signup",
-              "api-reference/user/signin",
-              "api-reference/user/forgot-password",
-              "api-reference/user/reset-password",
-              "api-reference/user/qrcode-signin"
-            ]
-          },
-          {
-            "group": "User",
+            "group": "User Management",
             "pages": [
               "api-reference/user/get-profile",
-              "api-reference/user/update-profile",
-              "api-reference/user/get-company-user",
-              "api-reference/user/invite-user",
-              "api-reference/user/feedback",
-              "api-reference/user/delete-account"
+              "api-reference/user/get-company-user"
             ]
           },
           {
-            "group": "Clients",
+            "group": "Client Management",
             "pages": [
               "api-reference/client/add",
               "api-reference/client/update",
               "api-reference/client/delete",
-              "api-reference/client/list",
               "api-reference/client/search",
+              "api-reference/client/list",
               "api-reference/client/user-client"
             ]
           },
           {
-            "group": "Rooms",
+            "group": "Room Management",
             "pages": [
+              "api-reference/room/measurement-type",
               "api-reference/room/add",
               "api-reference/room/update",
               "api-reference/room/delete",
+              "api-reference/room/get-category",
               "api-reference/room/get",
               "api-reference/room/get-by-client-id",
-              "api-reference/room/get-category",
-              "api-reference/room/measurement-type"
+              "api-reference/adminroom/index"
             ]
           },
           {
             "group": "Measurements",
             "pages": [
-              "api-reference/measurements/single-window",
               "api-reference/measurements/single-window-photo",
-              "api-reference/measurements/multiple-window",
               "api-reference/measurements/specialty-window",
               "api-reference/measurements/series-window-draperies",
               "api-reference/measurements/awning",
@@ -118,32 +73,26 @@
               "api-reference/lead-source/update",
               "api-reference/lead-source/user-leadsource"
             ]
-          },
-          {
-            "group": "Subscriptions",
-            "pages": [
-              "api-reference/transactions/get-user-current-plan",
-              "api-reference/transactions/init-payment",
-              "api-reference/transactions/complete-payment",
-              "api-reference/plans/index"
-            ]
-          },
-          {
-            "group": "Settings",
-            "pages": [
-              "api-reference/countries/index",
-              "api-reference/adminroom/index"
-            ]
           }
         ]
       }
     ]
   },
-  "footer": {
-    "socials": {
-      "twitter": "https://twitter.com/fss_measurement",
-      "github": "https://github.com/fss-measurement",
-      "linkedin": "https://www.linkedin.com/company/fss-measurement"
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Dashboard",
+        "href": "https://fssportal.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get API Token",
+      "href": "https://fssportal.com/admin/api-tokens"
     }
   }
 }

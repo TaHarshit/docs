@@ -1,13 +1,17 @@
 ---
-title: Delete Client
-api: 'POST /api/v1/client/delete'
-description: Delete a client
+title: Update Device Number
+api: 'POST /api/v1/user/update_devicenumber'
+description: Update user's device number
 ---
+
+# Update Device Number
+
+Update your registered device number.
 
 ## Endpoint
 
 ```
-POST /api/v1/client/delete
+POST /api/v1/user/update_devicenumber
 ```
 
 <Note>This endpoint requires authentication</Note>
@@ -29,40 +33,41 @@ POST /api/v1/client/delete
 </ParamField>
 ## Request Body
 
-<ParamField body="client_id" type="integer">
-  client id
+<ParamField body="device_number" type="string">
+  Device number
 </ParamField>
 
 ## Response
 
-<ResponseField name="message" type="string">
-  message
+<ResponseField name="status" type="string">
+  Success status
 </ResponseField>
-<ResponseField name="data" type="array">
-  data
+
+<ResponseField name="data" type="object">
+  Response data
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'http://fssportal.com/api/v1/client/delete' \
---header 'X-API-Token: YOUR_API_TOKEN' \
---header 'Content-Type: application/json' \
---data-raw '{
-  "client_id": 1
-}'
+curl -X POST http://localhost/fss/public/api/v1/user/update_devicenumber \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_number": "1234567890"
+  }'
 ```
 
 ```javascript JavaScript
-const response = await fetch('http://fssportal.com/api/v1/client/delete', {
+const response = await fetch('http://localhost/fss/public/api/v1/user/update_devicenumber', {
   method: 'POST',
   headers: {
     'X-API-Token': 'YOUR_API_TOKEN',
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-  "client_id": 1
-})
+    device_number: '1234567890'
+  })
 });
 
 const data = await response.json();
@@ -74,14 +79,18 @@ const data = await response.json();
 
 ```json Success Response
 {
-  "message": "Client deleted successfully.",
-  "data": []
+  "status": "success",
+  "data": {
+    "message": "Device number updated successfully"
+  }
+}
+```
+
+```json Error Response
+{
+  "status": "error",
+  "message": "Validation failed"
 }
 ```
 
 </ResponseExample>
-
-## Notes
-
-- Authentication is required
-

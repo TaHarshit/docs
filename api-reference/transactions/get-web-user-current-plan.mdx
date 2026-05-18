@@ -1,17 +1,17 @@
 ---
-title: Get Plans
-api: 'GET /api/v1/plans/index'
-description: Get available subscription plans
+title: Get Web User Current Plan
+api: 'POST /api/v1/transactions/get_web_user_current_plan'
+description: Get the web user's current subscription plan
 ---
 
-# Get Plans
+# Get Web User Current Plan
 
-Get all available subscription plans.
+Get the web user's current subscription plan.
 
 ## Endpoint
 
 ```
-GET /api/v1/plans/index
+POST /api/v1/transactions/get_web_user_current_plan
 ```
 
 <Note>This endpoint requires authentication</Note>
@@ -33,7 +33,9 @@ GET /api/v1/plans/index
 </ParamField>
 ## Request Body
 
-None
+```json
+{}
+```
 
 ## Response
 
@@ -41,23 +43,27 @@ None
   Success status
 </ResponseField>
 
-<ResponseField name="data" type="array">
-  Array of subscription plans
+<ResponseField name="data" type="object">
+  Current plan data
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl -X GET http://localhost/fss/public/api/v1/plans/index \
-  -H "X-API-Token: YOUR_API_TOKEN"
+curl -X POST http://localhost/fss/public/api/v1/transactions/get_web_user_current_plan \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}'
 ```
 
 ```javascript JavaScript
-const response = await fetch('http://localhost/fss/public/api/v1/plans/index', {
-  method: 'GET',
+const response = await fetch('http://localhost/fss/public/api/v1/transactions/get_web_user_current_plan', {
+  method: 'POST',
   headers: {
-    'X-API-Token': 'YOUR_API_TOKEN'
-  }
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
 });
 
 const data = await response.json();
@@ -70,29 +76,19 @@ const data = await response.json();
 ```json Success Response
 {
   "status": "success",
-  "data": [
-    {
-      "id": 1,
-      "name": "Basic",
-      "price": 29.99,
-      "interval": "monthly",
-      "features": ["Feature 1", "Feature 2"]
-    },
-    {
-      "id": 2,
-      "name": "Pro",
-      "price": 49.99,
-      "interval": "monthly",
-      "features": ["Feature 1", "Feature 2", "Feature 3"]
-    }
-  ]
+  "data": {
+    "plan_id": 2,
+    "plan_name": "Pro",
+    "status": "active",
+    "renews_at": "2024-02-15"
+  }
 }
 ```
 
 ```json Error Response
 {
   "status": "error",
-  "message": "Unauthorized"
+  "message": "No active subscription"
 }
 ```
 

@@ -1,13 +1,17 @@
 ---
-title: Delete Client
-api: 'POST /api/v1/client/delete'
-description: Delete a client
+title: Delete Measurement Image
+api: 'POST /api/v1/measurements/delete-image'
+description: Delete a measurement photo
 ---
+
+# Delete Measurement Image
+
+Delete a measurement photo.
 
 ## Endpoint
 
 ```
-POST /api/v1/client/delete
+POST /api/v1/measurements/delete-image
 ```
 
 <Note>This endpoint requires authentication</Note>
@@ -29,40 +33,41 @@ POST /api/v1/client/delete
 </ParamField>
 ## Request Body
 
-<ParamField body="client_id" type="integer">
-  client id
+<ParamField body="image_id" type="integer">
+  Image ID
 </ParamField>
 
 ## Response
 
-<ResponseField name="message" type="string">
-  message
+<ResponseField name="status" type="string">
+  Success status
 </ResponseField>
-<ResponseField name="data" type="array">
-  data
+
+<ResponseField name="message" type="string">
+  Success message
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'http://fssportal.com/api/v1/client/delete' \
---header 'X-API-Token: YOUR_API_TOKEN' \
---header 'Content-Type: application/json' \
---data-raw '{
-  "client_id": 1
-}'
+curl -X POST http://localhost/fss/public/api/v1/measurements/delete-image \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_id": 456
+  }'
 ```
 
 ```javascript JavaScript
-const response = await fetch('http://fssportal.com/api/v1/client/delete', {
+const response = await fetch('http://localhost/fss/public/api/v1/measurements/delete-image', {
   method: 'POST',
   headers: {
     'X-API-Token': 'YOUR_API_TOKEN',
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-  "client_id": 1
-})
+    image_id: 456
+  })
 });
 
 const data = await response.json();
@@ -74,14 +79,16 @@ const data = await response.json();
 
 ```json Success Response
 {
-  "message": "Client deleted successfully.",
-  "data": []
+  "status": "success",
+  "message": "Image deleted successfully"
+}
+```
+
+```json Error Response
+{
+  "status": "error",
+  "message": "Image not found"
 }
 ```
 
 </ResponseExample>
-
-## Notes
-
-- Authentication is required
-

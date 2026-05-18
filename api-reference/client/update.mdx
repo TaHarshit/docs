@@ -1,179 +1,201 @@
 ---
-title: "POST /client/update — Update Client Information"
-sidebarTitle: "Update Client"
-description: "POST /client/update — Update an existing client's contact details, address, or lead source by providing the client ID and new values."
+title: Update Client
+api: 'POST /api/v1/client/update'
+description: Update an existing client
 ---
-
-Use this endpoint to modify an existing client record. You supply the `client_id` of the record you want to update along with any fields you want to change. All fields other than `client_id`, `name`, `surname`, and `email` are optional — omitting them leaves the existing values unchanged. Use this endpoint when a client's address, contact details, or project information has changed.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/client/update
+POST /api/v1/client/update
 ```
 
-## Required headers
+<Note>This endpoint requires authentication</Note>
 
-| Header | Value |
-|---|---|
-| `platform` | `WEB` |
-| `api-key` | `FSS2023` |
-| `Authorization` | `Bearer {your_token}` |
-| `Content-Type` | `application/json` |
 
-## Request body
+
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
+## Request Body
 
 <ParamField body="client_id" type="integer" required>
-  The unique ID of the client record to update. You can retrieve this from `GET /client/list`.
+  The unique identifier of the client to update.
 </ParamField>
 
 <ParamField body="name" type="string" required>
-  The client's first name.
+  name
 </ParamField>
 
 <ParamField body="surname" type="string" required>
-  The client's last name.
+  surname
 </ParamField>
 
 <ParamField body="email" type="string" required>
-  The client's email address.
+  email
 </ParamField>
 
 <ParamField body="location" type="string">
-  The project site or location identifier for this client.
+  location
 </ParamField>
 
 <ParamField body="phone" type="string">
-  The client's primary phone number.
-</ParamField>
-
-<ParamField body="phone_no" type="string">
-  An additional phone number for the client.
+  phone
 </ParamField>
 
 <ParamField body="address" type="string">
-  The client's service street address.
+  address
 </ParamField>
 
 <ParamField body="city" type="string">
-  The city for the service address.
+  city
 </ParamField>
 
 <ParamField body="state" type="string">
-  The state for the service address.
+  state
 </ParamField>
 
 <ParamField body="zip_code" type="string">
-  The ZIP code for the service address.
+  zip code
 </ParamField>
 
 <ParamField body="billing_address" type="string">
-  The client's billing street address.
+  billing address
 </ParamField>
 
 <ParamField body="billing_city" type="string">
-  The city for the billing address.
+  billing city
 </ParamField>
 
 <ParamField body="billing_state" type="string">
-  The state for the billing address.
+  billing state
 </ParamField>
 
 <ParamField body="billing_zip_code" type="string">
-  The ZIP code for the billing address.
+  billing zip code
 </ParamField>
 
-<ParamField body="lead_source_id" type="integer">
-  The ID of the lead source to associate with this client.
+<ParamField body="phone_no" type="string">
+  phone no
 </ParamField>
 
 <ParamField body="lead_source_name" type="string">
-  The display name of the lead source.
+  lead source name
 </ParamField>
 
 <ParamField body="quote_no" type="string">
-  The quote number associated with this client record.
+  quote no
+</ParamField>
+
+<ParamField body="lead_source_id" type="integer">
+  lead source id
 </ParamField>
 
 <ParamField body="project_name" type="string">
-  The name of the project associated with this client.
+  project name
 </ParamField>
 
 <ParamField body="end_client_known" type="boolean">
-  Set to `true` if the end client's identity is known.
+  end client known
 </ParamField>
 
-## Response fields
+## Response
 
 <ResponseField name="message" type="string">
-  A confirmation message indicating the result of the operation.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="array">
-  An empty array returned on successful update.
+  data
 </ResponseField>
 
-## Example request
+<RequestExample>
 
-```bash
-curl --request POST \
-  --url https://fssportal.com/api/v1/client/update \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "client_id": 1164,
-    "name": "John",
-    "surname": "Doe",
-    "email": "john.doe@example.com",
-    "location": "Rajkot",
-    "phone": "1234567890",
-    "address": "456 Elm Street",
-    "city": "Rajkot",
-    "state": "Gujarat",
-    "zip_code": "360006",
-    "billing_address": "456 Elm Street",
-    "billing_city": "Rajkot",
-    "billing_state": "Gujarat",
-    "billing_zip_code": "360006",
-    "phone_no": "7023927561",
-    "lead_source_name": "",
-    "quote_no": "QT-2024-001",
-    "lead_source_id": 17,
-    "project_name": "Rajkot Residential",
-    "end_client_known": true
-  }'
+```bash cURL
+curl --location 'http://fssportal.com/api/v1/client/update' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "client_id": 1164,
+  "name": "John",
+  "surname": "Doe",
+  "email": "john2@example.com",
+  "location": "Rajkot",
+  "phone": "1234567890",
+  "address": "123 Main St",
+  "city": "Rajkot",
+  "state": "Gujarat",
+  "zip_code": "360006",
+  "billing_address": "123 main St",
+  "billing_city": "Rajkot",
+  "billing_state": "Gujarat",
+  "billing_zip_code": "360006",
+  "phone_no": "7023927561",
+  "lead_source_name": "",
+  "quote_no": "Eeeerer",
+  "lead_source_id": 17,
+  "project_name": "Rajkot",
+  "end_client_known": true
+}'
 ```
 
-## Success response
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/client/update', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "client_id": 1164,
+  "name": "John",
+  "surname": "Doe",
+  "email": "john2@example.com",
+  "location": "Rajkot",
+  "phone": "1234567890",
+  "address": "123 Main St",
+  "city": "Rajkot",
+  "state": "Gujarat",
+  "zip_code": "360006",
+  "billing_address": "123 main St",
+  "billing_city": "Rajkot",
+  "billing_state": "Gujarat",
+  "billing_zip_code": "360006",
+  "phone_no": "7023927561",
+  "lead_source_name": "",
+  "quote_no": "Eeeerer",
+  "lead_source_id": 17,
+  "project_name": "Rajkot",
+  "end_client_known": true
+})
+});
 
-```json
+const data = await response.json();
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
 {
   "message": "Client details updated successfully.",
   "data": []
 }
 ```
 
-## Error responses
+</ResponseExample>
 
-```json 422 Validation error
-{
-  "message": "The given data was invalid.",
-  "errors": {
-    "client_id": ["The client id field is required."]
-  }
-}
-```
+## Notes
 
-```json 404 Not found
-{
-  "message": "Client not found."
-}
-```
+- Authentication is required
 
-```json 401 Unauthorized
-{
-  "message": "Unauthenticated."
-}
-```

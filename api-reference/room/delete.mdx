@@ -1,80 +1,79 @@
 ---
-title: "POST /room/delete — Delete a Room"
-sidebarTitle: "Delete Room"
-description: "POST /room/delete — Permanently delete a room and all its measurements from a client project by room ID. This action cannot be undone."
+title: Delete Room
+api: 'POST /api/v1/room/delete'
+description: Delete a room
 ---
-
-Use this endpoint to permanently delete a room from a client project. You identify the room by its ID. The deletion cannot be undone through the API.
-
-<Warning>
-  Deleting a room permanently removes all measurements associated with that room. This action cannot be undone. Retrieve and back up any measurement data before calling this endpoint.
-</Warning>
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/room/delete
+POST /api/v1/room/delete
 ```
+
+<Note>This endpoint requires authentication</Note>
+
+
 
 ## Headers
 
-| Header          | Value                  | Required |
-|-----------------|------------------------|----------|
-| `platform`      | `WEB`                  | Yes      |
-| `api-key`       | `FSS2023`              | Yes      |
-| `Authorization` | `Bearer {your_token}`  | Yes      |
-| `Content-Type`  | `application/json`     | Yes      |
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
 ## Request Body
 
 <ParamField body="room_id" type="integer" required>
-  The unique ID of the room to delete. You can retrieve room IDs from the `GET /room/get` or `GET /room/get_by_client_id` endpoints.
+  The unique identifier of the room to delete.
 </ParamField>
 
 ## Response
 
-A successful deletion returns an HTTP `200` status with a `null` body. No additional data is returned.
+
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://fssportal.com/api/v1/room/delete' \
---header 'platform: WEB' \
---header 'api-key: FSS2023' \
---header 'Authorization: Bearer {your_token}' \
+curl --location 'http://fssportal.com/api/v1/room/delete' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-  "room_id": 4945
+  "room_id": 1
 }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/room/delete', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "room_id": 1
+})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200 Success
+```json Success Response
 null
 ```
 
-```json 401 Unauthorized
-{
-  "message": "Unauthenticated."
-}
-```
-
-```json 422 Unprocessable Entity
-{
-  "message": "The room_id field is required.",
-  "errors": {
-    "room_id": ["The room_id field is required."]
-  }
-}
-```
-
-```json 404 Not Found
-{
-  "message": "Room not found."
-}
-```
-
 </ResponseExample>
+
+## Notes
+
+- Authentication is required
+

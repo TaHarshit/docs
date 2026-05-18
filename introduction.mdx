@@ -1,123 +1,155 @@
 ---
-title: "FSS Measurement API: Overview and Key Concepts"
-description: "Learn what the FSS Measurement API offers, how it's organized, and the core concepts you need to know before you start integrating."
+title: Introduction
+description: FSS Measurement API Documentation
 ---
 
-The FSS Measurement API gives you programmatic access to the full FSS platform — from managing client records and room configurations to capturing window measurements and tracking lead sources. It is designed for developers building custom integrations, mobile applications, and automated workflows on top of FSS Measurement. All interactions follow a consistent REST pattern and return JSON responses.
+# FSS Measurement API
+
+Welcome to the FSS Measurement API documentation. This API allows you to manage clients, rooms, measurements, and more.
 
 ## Base URL
 
-All API requests target the following base URL:
+The API base URL is configurable:
 
-```
-https://fssportal.com/api/v1
-```
+- **Local Development**: `http://fssportal.com/api/v1`
+- **Production**: `https://fssportal.com/api/v1`
 
-<Note>
-  The interactive API playground only supports HTTPS. For local HTTP testing, use a REST client such as curl, Insomnia, or Postman pointed at your local endpoint.
-</Note>
+## Authentication
 
-## API modules
+All API endpoints (except countries and how-it-works) require authentication using an API token.
 
-The API is organized into six functional modules. Each module groups related endpoints together so you can find what you need quickly.
+**Authentication Methods:**
+- `X-API-Token: YOUR_API_TOKEN` (Recommended)
+- `Authorization: Bearer YOUR_TOKEN`
 
-<CardGroup cols={3}>
-  <Card title="User" icon="user" href="/api-reference/user">
-    Authentication, signup, profile, and password management.
-  </Card>
-  <Card title="Clients" icon="users" href="/api-reference/client">
-    Create and manage client records and contact information.
-  </Card>
-  <Card title="Rooms" icon="door-open" href="/api-reference/room">
-    Organize projects into rooms with measurement type settings.
-  </Card>
-  <Card title="Measurements" icon="ruler" href="/api-reference/measurements">
-    Record window measurements across all supported window types.
-  </Card>
-  <Card title="Lead Sources" icon="flag" href="/api-reference/lead-source">
-    Track and manage where your clients originate.
-  </Card>
-  <Card title="Subscriptions" icon="credit-card" href="/api-reference/plans">
-    Query subscription plans and verify active access.
-  </Card>
-</CardGroup>
+To get an API token, visit your dashboard at https://dashboard.fss-measurement.com.
 
-<AccordionGroup>
-  <Accordion icon="user" title="User">
-    Handles account creation, authentication, password management, and profile retrieval. These endpoints are the entry point for all integrations — you sign in here to receive the Bearer token used by every other module.
-  </Accordion>
-  <Accordion icon="users" title="Clients">
-    Create, retrieve, update, and delete client records. Clients are the top-level entity in FSS — rooms and measurements are always associated with a client.
-  </Accordion>
-  <Accordion icon="door-open" title="Rooms">
-    Manage rooms within a client project. Each room can hold multiple window measurements, and rooms support custom measurement type configurations.
-  </Accordion>
-  <Accordion icon="ruler" title="Measurements">
-    Record and retrieve window measurements. Supports single windows, multiple windows, specialty windows, and awnings.
-  </Accordion>
-  <Accordion icon="flag" title="Lead Sources">
-    Create and manage lead source records to track where clients originate. Useful for reporting and attribution.
-  </Accordion>
-  <Accordion icon="credit-card" title="Subscriptions">
-    Query active subscription plans and transaction history. Most protected endpoints require a valid subscription — use this module to verify status programmatically.
-  </Accordion>
-</AccordionGroup>
+## Rate Limiting
 
-## Response format
+The API is rate-limited to **60 requests per minute** per API token.
 
-Every API response — success or error — returns JSON with a consistent envelope structure.
+## Response Format
 
-**Success response**
+All API responses follow this format:
 
 ```json
 {
   "status": "success",
-  "message": "Operation completed successfully.",
-  "data": { }
+  "data": { ... },
+  "message": "Success message"
 }
 ```
 
-**Error response**
+## Using the Playground
 
+The API documentation includes an interactive playground for testing endpoints. To use it:
+
+1. Click the "Try it out" button on any API endpoint
+2. Enter your API token in the authentication field
+3. Fill in the required parameters
+4. Click "Send Request" to test the endpoint
+
+**Note**: The Mintlify playground only supports HTTPS URLs and is configured for production. For local testing with `http://localhost`, use the provided Postman collection instead.
+
+## Subscription Requirements
+
+API v1 requires an active subscription. Your token will only work if you have:
+- Active Stripe subscription, OR
+- Active trial period, OR
+- Active cash subscription
+
+If your subscription expires, your API token will stop working until you renew.
+
+## Rate Limiting
+
+API requests are rate limited to 60 requests per minute per token.
+
+## Response Format
+
+All API responses follow this format:
+
+**Success Response:**
+```json
+{
+  "status": "success",
+  "data": { ... }
+}
+```
+
+**Error Response:**
 ```json
 {
   "status": "error",
-  "message": "A description of what went wrong."
+  "message": "Error description"
 }
 ```
 
-The `data` field contains the resource or list of resources returned by the endpoint. On error, `data` is omitted and `message` explains the failure.
+## API Endpoints
 
-## Rate limiting
+The API is organized into the following categories:
 
-The API allows **60 requests per minute** per user token. Every response includes the following headers so you can track consumption:
+- [Authentication](./authentication) - User signup, login, password reset
+- [User Management](./api-reference/user) - Profile, settings, account management
+- [Client Management](./api-reference/client) - Client CRUD operations
+- [Room Management](./api-reference/room) - Room and measurement types
+- [Measurements](./api-reference/measurements) - Window and room measurements
+- [Lead Sources](./api-reference/lead-source) - Lead source management
+- [Plans & Subscriptions](./api-reference/plans) - Subscription plans
+- [Settings](./api-reference/countries) - Country data and settings
 
-| Header | Description |
-|---|---|
-| `X-RateLimit-Limit` | Maximum number of requests allowed per minute |
-| `X-RateLimit-Remaining` | Number of requests remaining in the current window |
+## Error Codes
 
-When you exceed the limit, the API returns a `429 Too Many Requests` response. Back off and retry after the current window resets.
-
-## Error status codes
-
-| Status code | Meaning |
-|---|---|
-| `200` | Request succeeded |
-| `401` | Unauthorized — missing or invalid Bearer token |
-| `403` | Forbidden — valid token but no active subscription |
-| `404` | Not found — the requested resource does not exist |
-| `422` | Validation error — the request body failed validation |
-| `429` | Too many requests — rate limit exceeded |
-| `500` | Internal server error — contact support if this persists |
+| Status Code | Description |
+|-------------|-------------|
+| 200 | Success |
+| 401 | Unauthorized - Invalid or missing API token |
+| 403 | Forbidden - No active subscription |
+| 404 | Not Found - Resource doesn't exist |
+| 422 | Validation Error - Invalid request data |
+| 500 | Server Error - Internal server error |
 
 ## Versioning
 
-The current stable version is **v1**, reflected in the base URL path `/api/v1`. Future releases will increment the version number (`v2`, `v3`, and so on). Version 1 will remain supported and receive no breaking changes after new versions are released.
+This is API version 1 (v1). Future versions will be released as v2, v3, etc. The current version will remain stable and supported.
+
+## Key Features
+
+<AccordionGroup>
+  <Accordion icon="user" title="User Management">
+    Complete user authentication and profile management system with support for company accounts and team collaboration.
+  </Accordion>
+  <Accordion icon="users" title="Client Management">
+    Manage client information, projects, and contact details with advanced search capabilities.
+  </Accordion>
+  <Accordion icon="ruler" title="Measurement Tools">
+    Support for multiple window types including single windows, multiple windows, specialty windows, and awnings.
+  </Accordion>
+  <Accordion icon="credit-card" title="Subscription Management">
+    Integrated payment processing with Stripe for subscription-based access.
+  </Accordion>
+</AccordionGroup>
+
+## Base URL
+
+```
+https://api.fss-measurement.com/api
+```
+
+## API Versions
+
+The current API version is **v1**. All endpoints are versioned to ensure backward compatibility.
+
+## Rate Limiting
+
+API requests are limited to **60 requests per minute** per user. Rate limit information is included in response headers:
+
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Remaining requests in current window
 
 ## Support
 
-If you encounter an issue or need help integrating:
+Need help? Contact our support team:
 
-- **Email**: [support@fss-measurement.com](mailto:support@fss-measurement.com)
-- **Status page**: [https://status.fss-measurement.com](https://status.fss-measurement.com)
+- **Email**: support@fss-measurement.com
+- **Documentation**: https://docs.fss-measurement.com
+- **Status Page**: https://status.fss-measurement.com

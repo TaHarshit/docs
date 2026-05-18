@@ -1,151 +1,152 @@
 ---
-title: "POST /lead-source/user-leadsource — Assign Lead Source"
-sidebarTitle: "Assign Lead Source"
-description: "POST /lead-source/user-leadsource — Returns lead sources scoped to the current user. Use for per-user lead attribution in multi-member company accounts."
+title: Get User Lead Sources
+api: 'POST /api/v1/lead_source/user_leadsource'
+description: Get lead sources created by the user
 ---
-
-Use this endpoint to retrieve the lead sources that belong specifically to the authenticated user within your company account. Unlike the global get endpoint, this endpoint returns a paginated list scoped only to the current user, making it useful for managing lead attribution on a per-user basis. The response includes pagination metadata so you can iterate through large result sets.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/lead-source/user-leadsource
+POST /api/v1/lead_source/user_leadsource
 ```
 
-<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+<Note>This endpoint requires authentication</Note>
 
-## Request headers
+
+
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
 <ParamField header="platform" type="string" required>
-  Must be `WEB`.
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
 </ParamField>
 
-<ParamField header="api-key" type="string" required>
-  Your FSS API key. Use `FSS2023`.
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
 </ParamField>
+## Request Body
 
-<ParamField header="Authorization" type="string" required>
-  Bearer token from your login response. Format: `Bearer {your_token}`.
-</ParamField>
+No request body required.
 
-<ParamField header="Content-Type" type="string" required>
-  Must be `application/json`.
-</ParamField>
-
-## Request body
-
-No request body is required for this endpoint.
-
-## Response fields
+## Response
 
 <ResponseField name="message" type="string">
-  A human-readable status message, e.g. `"Lead Source get successfully."`.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="object">
-  A paginated result set containing the user's lead sources.
-  <Expandable title="Pagination wrapper">
+  data
+  <Expandable title="data">
     <ResponseField name="current_page" type="integer">
-      The current page number.
+      current page
     </ResponseField>
     <ResponseField name="data" type="array">
-      Array of lead source records for the current page.
-      <Expandable title="Lead source object">
+      data
+      <Expandable title="data item">
         <ResponseField name="id" type="integer">
-          Unique identifier for the lead source record.
+          id
         </ResponseField>
         <ResponseField name="company_name" type="string">
-          Company or organization name. May be empty.
+          company name
         </ResponseField>
         <ResponseField name="name" type="string">
-          First name of the lead source contact.
+          name
         </ResponseField>
         <ResponseField name="surname" type="string">
-          Last name of the lead source contact.
+          surname
         </ResponseField>
         <ResponseField name="email" type="string">
-          Email address of the lead source contact.
+          email
         </ResponseField>
         <ResponseField name="phone_no" type="string">
-          Phone number. May be empty.
+          phone no
         </ResponseField>
         <ResponseField name="address" type="string">
-          Street address. May be empty.
-        </ResponseField>
-        <ResponseField name="city" type="string">
-          City. May be empty.
+          address
         </ResponseField>
         <ResponseField name="state" type="string">
-          State or region. May be empty or `"Not Found"`.
+          state
+        </ResponseField>
+        <ResponseField name="city" type="string">
+          city
         </ResponseField>
         <ResponseField name="zip_code" type="string">
-          Postal or ZIP code. May be empty.
-        </ResponseField>
-      </Expandable>
+          zip code
+        </ResponseField>      </Expandable>
     </ResponseField>
     <ResponseField name="first_page_url" type="string">
-      URL for the first page of results.
+      first page url
     </ResponseField>
     <ResponseField name="from" type="integer">
-      The index of the first record on the current page (1-based).
+      from
     </ResponseField>
     <ResponseField name="last_page" type="integer">
-      Total number of pages available.
+      last page
     </ResponseField>
     <ResponseField name="last_page_url" type="string">
-      URL for the last page of results.
+      last page url
     </ResponseField>
     <ResponseField name="links" type="array">
-      Pagination links array with previous, numbered, and next page entries.
-      <Expandable title="Link object">
-        <ResponseField name="url" type="string">
-          URL for the page. `null` if the link is not active (e.g. no previous page).
+      links
+      <Expandable title="links item">
+        <ResponseField name="url" type="object">
+          url
         </ResponseField>
         <ResponseField name="label" type="string">
-          Display label for the link, e.g. `"1"`, `"&laquo; Previous"`, `"Next &raquo;"`.
+          label
         </ResponseField>
         <ResponseField name="active" type="boolean">
-          `true` if this link represents the current page.
-        </ResponseField>
-      </Expandable>
+          active
+        </ResponseField>      </Expandable>
     </ResponseField>
-    <ResponseField name="next_page_url" type="string">
-      URL for the next page, or `null` if you are on the last page.
+    <ResponseField name="next_page_url" type="object">
+      next page url
     </ResponseField>
     <ResponseField name="path" type="string">
-      The base URL for this endpoint.
+      path
     </ResponseField>
     <ResponseField name="per_page" type="integer">
-      Number of records returned per page. Default is `20`.
+      per page
     </ResponseField>
-    <ResponseField name="prev_page_url" type="string">
-      URL for the previous page, or `null` if you are on the first page.
+    <ResponseField name="prev_page_url" type="object">
+      prev page url
     </ResponseField>
     <ResponseField name="to" type="integer">
-      The index of the last record on the current page (1-based).
+      to
     </ResponseField>
     <ResponseField name="total" type="integer">
-      Total number of lead source records for this user.
-    </ResponseField>
-  </Expandable>
+      total
+    </ResponseField>  </Expandable>
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/lead-source/user-leadsource \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json'
+curl --location 'http://fssportal.com/api/v1/lead_source/user_leadsource' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/lead_source/user_leadsource', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "message": "Lead Source get successfully.",
   "data": {
@@ -153,40 +154,182 @@ curl --request POST \
     "data": [
       {
         "id": 148,
-        "company_name": "Acme Corp",
-        "name": "Jane",
-        "surname": "Doe",
-        "email": "jane.doe@example.com",
-        "phone_no": "5551234567",
-        "address": "123 Main Street",
-        "city": "Dallas",
-        "state": "Texas",
-        "zip_code": "75201"
+        "company_name": "630311275",
+        "name": "Harshit3",
+        "surname": "Chauhan",
+        "email": "harshitchauhan5922+lc2@gmail.com",
+        "phone_no": "7203927561",
+        "address": "",
+        "state": "",
+        "city": "",
+        "zip_code": ""
+      },
+      {
+        "id": 147,
+        "company_name": "Hap Tech",
+        "name": "Harshit2",
+        "surname": "Chauhan",
+        "email": "harshitchauhan5922+le2@gmail.com",
+        "phone_no": "7203927561",
+        "address": "A-901 Ami Heights, Arihant nagar-1, b/h F.C.I Godaun, Jamnag",
+        "state": "Gujarat",
+        "city": "Rakot",
+        "zip_code": "110001"
+      },
+      {
+        "id": 146,
+        "company_name": "Hap Tech",
+        "name": "Harshit",
+        "surname": "Chauhan",
+        "email": "harshitchauhan5922+lead2@gmail.com",
+        "phone_no": "7203927561",
+        "address": "A-901 Ami Heights, Arihant nagar-1, b/h F.C.I Godaun, Jamnag",
+        "state": "Gujarat",
+        "city": "Rakot",
+        "zip_code": "110001"
+      },
+      {
+        "id": 76,
+        "company_name": "",
+        "name": "Sn",
+        "surname": "Aa",
+        "email": "ae@gmail.cm",
+        "phone_no": "12345678",
+        "address": "",
+        "state": "Not Found",
+        "city": "",
+        "zip_code": ""
+      },
+      {
+        "id": 75,
+        "company_name": "",
+        "name": "Snv",
+        "surname": "Rtr",
+        "email": "ddddnv@gmail.com",
+        "phone_no": "",
+        "address": "",
+        "state": "Not Found",
+        "city": "",
+        "zip_code": ""
+      },
+      {
+        "id": 60,
+        "company_name": "Smith Construction",
+        "name": "John",
+        "surname": "Smith",
+        "email": "j.smith@smith.con",
+        "phone_no": "3692572580",
+        "address": "123 Street Rd.",
+        "state": "Arkansas",
+        "city": "Boren",
+        "zip_code": "75286"
+      },
+      {
+        "id": 59,
+        "company_name": "Deutsch Interiors",
+        "name": "Sally",
+        "surname": "Smith",
+        "email": "sally@di.com",
+        "phone_no": "",
+        "address": "",
+        "state": "Not Found",
+        "city": "",
+        "zip_code": ""
+      },
+      {
+        "id": 51,
+        "company_name": "Techavtra",
+        "name": "Priyanka",
+        "surname": "Nagvadia",
+        "email": "priyanka@gmail.com",
+        "phone_no": "",
+        "address": "KKv hall",
+        "state": "CT",
+        "city": "Rajkot",
+        "zip_code": "361001"
+      },
+      {
+        "id": 50,
+        "company_name": "TEch",
+        "name": "Dhyara",
+        "surname": "Nagvadia",
+        "email": "dh@gmail.com",
+        "phone_no": "",
+        "address": "Kalavad raod",
+        "state": "DE",
+        "city": "Rajkot",
+        "zip_code": "361001"
+      },
+      {
+        "id": 20,
+        "company_name": "lead",
+        "name": "Ski",
+        "surname": "Ms",
+        "email": "lea@gmail.com",
+        "phone_no": "8460008773",
+        "address": "F",
+        "state": "California",
+        "city": "S",
+        "zip_code": "350004"
+      },
+      {
+        "id": 5,
+        "company_name": "Test1",
+        "name": "Harshit009",
+        "surname": "Chauhan",
+        "email": "harshitchauhan@gmail.com",
+        "phone_no": "",
+        "address": "Test Address",
+        "state": "Not Found",
+        "city": "Rajkot",
+        "zip_code": "360006"
+      },
+      {
+        "id": 3,
+        "company_name": "Pyjkkajkadfasdf",
+        "name": "AVNI 12345",
+        "surname": "TECHAVTRA",
+        "email": "Avni.thakrar@gmail.com",
+        "phone_no": "",
+        "address": "Rajkot",
+        "state": "Not Found",
+        "city": "Rajkot",
+        "zip_code": "3611002"
       }
     ],
-    "first_page_url": "https://fssportal.com/api/v1/lead-source/user-leadsource?page=1",
+    "first_page_url": "http://localhost/fss/public/api/v1/lead_source/user_leadsource?page=1",
     "from": 1,
     "last_page": 1,
-    "last_page_url": "https://fssportal.com/api/v1/lead-source/user-leadsource?page=1",
+    "last_page_url": "http://localhost/fss/public/api/v1/lead_source/user_leadsource?page=1",
     "links": [
-      { "url": null, "label": "&laquo; Previous", "active": false },
-      { "url": "https://fssportal.com/api/v1/lead-source/user-leadsource?page=1", "label": "1", "active": true },
-      { "url": null, "label": "Next &raquo;", "active": false }
+      {
+        "url": null,
+        "label": "&laquo; Previous",
+        "active": false
+      },
+      {
+        "url": "http://localhost/fss/public/api/v1/lead_source/user_leadsource?page=1",
+        "label": "1",
+        "active": true
+      },
+      {
+        "url": null,
+        "label": "Next &raquo;",
+        "active": false
+      }
     ],
     "next_page_url": null,
-    "path": "https://fssportal.com/api/v1/lead-source/user-leadsource",
+    "path": "http://localhost/fss/public/api/v1/lead_source/user_leadsource",
     "per_page": 20,
     "prev_page_url": null,
-    "to": 1,
-    "total": 1
+    "to": 12,
+    "total": 12
   }
 }
 ```
 
-```json 401
-{
-  "message": "Unauthenticated."
-}
-```
-
 </ResponseExample>
+
+## Notes
+
+- Authentication is required

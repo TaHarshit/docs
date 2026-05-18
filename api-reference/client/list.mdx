@@ -1,177 +1,211 @@
 ---
-title: "GET /client/list — List All Clients"
-sidebarTitle: "List Clients"
-description: "GET /client/list — Returns a paginated list of all client records for the authenticated user. Supports keyword filtering and page-based navigation."
+title: Get Client List
+api: 'POST /api/v1/client/list'
+description: Get paginated list of clients
 ---
-
-Use this endpoint to retrieve a paginated list of all client records associated with your account. You can optionally pass a keyword to filter results and control the page number and page size. The response includes full client details for each record along with pagination metadata so you can iterate through large result sets.
 
 ## Endpoint
 
 ```
-GET https://fssportal.com/api/v1/client/list
+POST /api/v1/client/list
 ```
 
-## Required headers
+<Note>This endpoint requires authentication</Note>
 
-| Header | Value |
-|---|---|
-| `platform` | `WEB` |
-| `api-key` | `FSS2023` |
-| `Authorization` | `Bearer {your_token}` |
-| `Content-Type` | `application/json` |
 
-## Request body
+
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
+## Request Body
 
 <ParamField body="keyword" type="string">
-  Filter results to clients whose name, email, or other fields contain this string. Omit to return all clients.
+  keyword
 </ParamField>
 
-<ParamField body="page" type="integer" default="1">
-  The page number to retrieve. Defaults to `1`.
+<ParamField body="page" type="integer">
+  page
 </ParamField>
 
-<ParamField body="limit" type="integer" default="20">
-  The number of records to return per page. Defaults to `20`.
+<ParamField body="limit" type="integer">
+  limit
 </ParamField>
 
-## Response fields
+## Response
 
 <ResponseField name="message" type="string">
-  A status message for the request.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="object">
-  The paginated response envelope.
-  <Expandable title="properties">
+  data
+  <Expandable title="data">
     <ResponseField name="current_page" type="integer">
-      The current page number in the result set.
-    </ResponseField>
-    <ResponseField name="per_page" type="integer">
-      The number of records returned per page.
-    </ResponseField>
-    <ResponseField name="total" type="integer">
-      The total number of client records matching the query.
-    </ResponseField>
-    <ResponseField name="last_page" type="integer">
-      The number of the final page. Use this to determine when you have retrieved all records.
-    </ResponseField>
-    <ResponseField name="from" type="integer">
-      The 1-based index of the first record on the current page.
-    </ResponseField>
-    <ResponseField name="to" type="integer">
-      The 1-based index of the last record on the current page.
-    </ResponseField>
-    <ResponseField name="next_page_url" type="string">
-      The URL for the next page of results. `null` when on the last page.
-    </ResponseField>
-    <ResponseField name="prev_page_url" type="string">
-      The URL for the previous page of results. `null` when on the first page.
+      current page
     </ResponseField>
     <ResponseField name="data" type="array">
-      The array of client records for the current page.
-      <Expandable title="client object">
+      data
+      <Expandable title="data item">
         <ResponseField name="id" type="integer">
-          The unique ID of the client record.
+          id
         </ResponseField>
         <ResponseField name="user_id" type="integer">
-          The ID of the user who owns this client record.
-        </ResponseField>
-        <ResponseField name="name" type="string">
-          The client's first name.
-        </ResponseField>
-        <ResponseField name="surname" type="string">
-          The client's last name.
-        </ResponseField>
-        <ResponseField name="email" type="string">
-          The client's email address.
-        </ResponseField>
-        <ResponseField name="phone_no" type="string">
-          The client's phone number.
-        </ResponseField>
-        <ResponseField name="location" type="string">
-          The project site or location identifier.
-        </ResponseField>
-        <ResponseField name="address" type="string">
-          The service street address.
-        </ResponseField>
-        <ResponseField name="city" type="string">
-          The city for the service address.
-        </ResponseField>
-        <ResponseField name="state" type="string">
-          The state for the service address.
-        </ResponseField>
-        <ResponseField name="zip_code" type="string">
-          The ZIP code for the service address.
-        </ResponseField>
-        <ResponseField name="billing_address" type="string">
-          The billing street address.
-        </ResponseField>
-        <ResponseField name="billing_city" type="string">
-          The city for the billing address.
-        </ResponseField>
-        <ResponseField name="billing_state" type="string">
-          The state for the billing address.
-        </ResponseField>
-        <ResponseField name="billing_zip_code" type="string">
-          The ZIP code for the billing address.
+          user id
         </ResponseField>
         <ResponseField name="lead_source_id" type="integer">
-          The ID of the associated lead source. `null` if not set.
-        </ResponseField>
-        <ResponseField name="lead_source_name" type="string">
-          The display name of the associated lead source. `null` if not set.
-        </ResponseField>
-        <ResponseField name="lead_source_email" type="string">
-          The email address of the associated lead source. `null` if not set.
-        </ResponseField>
-        <ResponseField name="quote_no" type="string">
-          The quote number associated with this client.
-        </ResponseField>
-        <ResponseField name="project_name" type="string">
-          The project name associated with this client.
+          lead source id
         </ResponseField>
         <ResponseField name="end_client_known" type="integer">
-          `1` if the end client's identity is known, `0` if not.
+          end client known
+        </ResponseField>
+        <ResponseField name="quote_no" type="string">
+          quote no
+        </ResponseField>
+        <ResponseField name="project_name" type="object">
+          project name
+        </ResponseField>
+        <ResponseField name="name" type="string">
+          name
+        </ResponseField>
+        <ResponseField name="surname" type="string">
+          surname
+        </ResponseField>
+        <ResponseField name="email" type="string">
+          email
+        </ResponseField>
+        <ResponseField name="phone_no" type="string">
+          phone no
+        </ResponseField>
+        <ResponseField name="location" type="string">
+          location
+        </ResponseField>
+        <ResponseField name="address" type="string">
+          address
+        </ResponseField>
+        <ResponseField name="state" type="string">
+          state
+        </ResponseField>
+        <ResponseField name="city" type="string">
+          city
+        </ResponseField>
+        <ResponseField name="zip_code" type="string">
+          zip code
+        </ResponseField>
+        <ResponseField name="billing_address" type="string">
+          billing address
+        </ResponseField>
+        <ResponseField name="billing_city" type="string">
+          billing city
+        </ResponseField>
+        <ResponseField name="billing_state" type="string">
+          billing state
+        </ResponseField>
+        <ResponseField name="billing_zip_code" type="string">
+          billing zip code
         </ResponseField>
         <ResponseField name="created_at" type="string">
-          The ISO 8601 timestamp when the record was created.
+          created at
         </ResponseField>
-      </Expandable>
+        <ResponseField name="lead_source_name" type="string">
+          lead source name
+        </ResponseField>
+        <ResponseField name="lead_source_email" type="string">
+          lead source email
+        </ResponseField>      </Expandable>
     </ResponseField>
-  </Expandable>
+    <ResponseField name="first_page_url" type="string">
+      first page url
+    </ResponseField>
+    <ResponseField name="from" type="integer">
+      from
+    </ResponseField>
+    <ResponseField name="last_page" type="integer">
+      last page
+    </ResponseField>
+    <ResponseField name="last_page_url" type="string">
+      last page url
+    </ResponseField>
+    <ResponseField name="links" type="array">
+      links
+      <Expandable title="links item">
+        <ResponseField name="url" type="object">
+          url
+        </ResponseField>
+        <ResponseField name="label" type="string">
+          label
+        </ResponseField>
+        <ResponseField name="active" type="boolean">
+          active
+        </ResponseField>      </Expandable>
+    </ResponseField>
+    <ResponseField name="next_page_url" type="object">
+      next page url
+    </ResponseField>
+    <ResponseField name="path" type="string">
+      path
+    </ResponseField>
+    <ResponseField name="per_page" type="integer">
+      per page
+    </ResponseField>
+    <ResponseField name="prev_page_url" type="object">
+      prev page url
+    </ResponseField>
+    <ResponseField name="to" type="integer">
+      to
+    </ResponseField>
+    <ResponseField name="total" type="integer">
+      total
+    </ResponseField>  </Expandable>
 </ResponseField>
 
-## Example request
+<RequestExample>
 
-```bash
-curl --request GET \
-  --url https://fssportal.com/api/v1/client/list \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "keyword": "john",
-    "page": 1,
-    "limit": 10
-  }'
+```bash cURL
+curl --location 'http://fssportal.com/api/v1/client/list' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "keyword": "test",
+  "page": 1,
+  "limit": 10
+}'
 ```
 
-## Success response
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/client/list', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "keyword": "test",
+  "page": 1,
+  "limit": 10
+})
+});
 
-```json
+const data = await response.json();
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
 {
   "message": "Client get successfully.",
   "data": {
     "current_page": 1,
-    "per_page": 10,
-    "total": 3,
-    "last_page": 1,
-    "from": 1,
-    "to": 3,
-    "next_page_url": null,
-    "prev_page_url": null,
     "data": [
       {
         "id": 1475,
@@ -180,32 +214,106 @@ curl --request GET \
         "end_client_known": 1,
         "quote_no": "",
         "project_name": null,
-        "name": "John",
-        "surname": "Doe",
-        "email": "john.doe@example.com",
+        "name": "Test",
+        "surname": "Convert Wuick Quote",
+        "email": "test@gmail.com",
         "phone_no": "8460008773",
-        "location": "Rajkot",
-        "address": "123 Main St",
-        "state": "Gujarat",
-        "city": "Rajkot",
-        "zip_code": "360006",
-        "billing_address": "123 Main St",
-        "billing_city": "Rajkot",
-        "billing_state": "Gujarat",
-        "billing_zip_code": "360006",
+        "location": "Quiuuu",
+        "address": "",
+        "state": "",
+        "city": "",
+        "zip_code": "",
+        "billing_address": "",
+        "billing_city": "",
+        "billing_state": "",
+        "billing_zip_code": "",
         "created_at": "2025-12-16T05:33:32.000000Z",
-        "lead_source_name": "Referral",
-        "lead_source_email": "referral@example.com"
+        "lead_source_name": "Snv Rtr",
+        "lead_source_email": "ddddnv@gmail.com"
+      },
+      {
+        "id": 1472,
+        "user_id": 68,
+        "lead_source_id": 76,
+        "end_client_known": 0,
+        "quote_no": "",
+        "project_name": "Test2",
+        "name": "Sn",
+        "surname": "Aa",
+        "email": "vjjv@gmail.com",
+        "phone_no": "12345678",
+        "location": "Hccjkv",
+        "address": "",
+        "state": "",
+        "city": "",
+        "zip_code": "",
+        "billing_address": "",
+        "billing_city": "",
+        "billing_state": "",
+        "billing_zip_code": "",
+        "created_at": "2025-12-16T05:18:22.000000Z",
+        "lead_source_name": "Sn Aa",
+        "lead_source_email": "ae@gmail.cm"
+      },
+      {
+        "id": 1471,
+        "user_id": 68,
+        "lead_source_id": null,
+        "end_client_known": 1,
+        "quote_no": "",
+        "project_name": "Test",
+        "name": "QuickQuote",
+        "surname": "QuickQuote",
+        "email": "fss_1765862270@unknown.com",
+        "phone_no": "",
+        "location": "QuickQuoteLocation",
+        "address": "",
+        "state": "",
+        "city": "",
+        "zip_code": "",
+        "billing_address": "",
+        "billing_city": "",
+        "billing_state": "",
+        "billing_zip_code": "",
+        "created_at": "2025-12-16T05:17:51.000000Z",
+        "lead_source_name": null,
+        "lead_source_email": null
       }
-    ]
+    ],
+    "first_page_url": "http://localhost/fss/public/api/v1/client/list?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "http://localhost/fss/public/api/v1/client/list?page=1",
+    "links": [
+      {
+        "url": null,
+        "label": "&laquo; Previous",
+        "active": false
+      },
+      {
+        "url": "http://localhost/fss/public/api/v1/client/list?page=1",
+        "label": "1",
+        "active": true
+      },
+      {
+        "url": null,
+        "label": "Next &raquo;",
+        "active": false
+      }
+    ],
+    "next_page_url": null,
+    "path": "http://localhost/fss/public/api/v1/client/list",
+    "per_page": 20,
+    "prev_page_url": null,
+    "to": 3,
+    "total": 3
   }
 }
 ```
 
-## Error responses
+</ResponseExample>
 
-```json 401 Unauthorized
-{
-  "message": "Unauthenticated."
-}
-```
+## Notes
+
+- Authentication is required
+

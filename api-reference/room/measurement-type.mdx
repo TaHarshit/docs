@@ -1,63 +1,78 @@
 ---
-title: "GET /room/measurement_type — List Measurement Types"
-sidebarTitle: "Measurement Types"
-description: "GET /room/measurement_type — Returns all supported measurement types with IDs and names. Use the returned IDs when assigning a measurement type to a room."
+title: Get Measurement Type
+api: 'POST /api/v1/room/measurement_type'
+description: Get available measurement types
 ---
-
-Use this endpoint to retrieve the complete list of measurement types supported by the FSS Measurement API. Each measurement type defines the form and data structure used when capturing window measurements in a room. You reference the `id` from this response when setting the measurement type on a room or when submitting measurement data.
 
 ## Endpoint
 
 ```
-GET https://fssportal.com/api/v1/room/measurement_type
+POST /api/v1/room/measurement_type
 ```
+
+<Note>This endpoint requires authentication</Note>
+
+
 
 ## Headers
 
-| Header          | Value                  | Required |
-|-----------------|------------------------|----------|
-| `platform`      | `WEB`                  | Yes      |
-| `api-key`       | `FSS2023`              | Yes      |
-| `Authorization` | `Bearer {your_token}`  | Yes      |
-| `Content-Type`  | `application/json`     | Yes      |
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
 ## Request Body
 
-This endpoint does not require a request body.
+No request body required.
 
 ## Response
 
 <ResponseField name="message" type="string">
-  A human-readable status message, for example `"Measurement type get successfully."`.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="array">
-  An array of measurement type objects representing all available options.
+  data
   <Expandable title="data item">
     <ResponseField name="id" type="integer">
-      The unique numeric ID of the measurement type. Use this value when assigning a measurement type to a room or submitting measurements.
+      id
     </ResponseField>
     <ResponseField name="name" type="string">
-      The display name of the measurement type, for example `"Single Window"` or `"Multi Window"`.
-    </ResponseField>
-  </Expandable>
+      name
+    </ResponseField>  </Expandable>
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://fssportal.com/api/v1/room/measurement_type' \
---header 'platform: WEB' \
---header 'api-key: FSS2023' \
---header 'Authorization: Bearer {your_token}' \
+curl --location 'http://fssportal.com/api/v1/room/measurement_type' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
 --header 'Content-Type: application/json'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/room/measurement_type', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200 Success
+```json Success Response
 {
   "message": "Measurement type get successfully.",
   "data": [
@@ -81,10 +96,8 @@ curl --location 'https://fssportal.com/api/v1/room/measurement_type' \
 }
 ```
 
-```json 401 Unauthorized
-{
-  "message": "Unauthenticated."
-}
-```
-
 </ResponseExample>
+
+## Notes
+
+- Authentication is required

@@ -1,62 +1,64 @@
 ---
-title: "POST /room/add — Create a Room for a Client"
-sidebarTitle: "Add Room"
-description: "POST /room/add — Create a new room within a client project. Accepts client ID, room name, and measurement type. Returns the new room."
+title: Add Room
+api: 'POST /api/v1/room/add'
+description: Add a new room for a client
 ---
-
-Use this endpoint to create a new room under an existing client project. You provide the client ID, a reference to the predefined room type, and an optional display name. On success, the API returns the ID of the newly created room, which you use in subsequent measurement requests.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/room/add
+POST /api/v1/room/add
 ```
+
+<Note>This endpoint requires authentication</Note>
+
+
 
 ## Headers
 
-| Header          | Value                  | Required |
-|-----------------|------------------------|----------|
-| `platform`      | `WEB`                  | Yes      |
-| `api-key`       | `FSS2023`              | Yes      |
-| `Authorization` | `Bearer {your_token}`  | Yes      |
-| `Content-Type`  | `application/json`     | Yes      |
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
 ## Request Body
 
 <ParamField body="client_id" type="integer" required>
-  The unique ID of the client under which the room will be created. You can obtain this from the client list endpoint.
+  client id
 </ParamField>
 
 <ParamField body="admin_room_id" type="integer" required>
-  The ID of the predefined room type to associate with this room. Use the `GET /room/get_category` endpoint to retrieve available room type IDs.
+  Reference to the predefined room type.
 </ParamField>
 
 <ParamField body="name" type="string">
-  A display name for the room (for example, `"Living Room"` or `"Master Bedroom"`). If omitted, the room inherits the name of the predefined room type.
+  name
 </ParamField>
 
 ## Response
 
 <ResponseField name="message" type="string">
-  A human-readable confirmation message, for example `"Room added successfully."`.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="object">
-  Contains the result of the create operation.
+  data
   <Expandable title="data">
     <ResponseField name="id" type="integer">
-      The unique ID of the newly created room. Use this ID when adding measurements or updating the room.
-    </ResponseField>
-  </Expandable>
+      id
+    </ResponseField>  </Expandable>
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://fssportal.com/api/v1/room/add' \
---header 'platform: WEB' \
---header 'api-key: FSS2023' \
---header 'Authorization: Bearer {your_token}' \
+curl --location 'http://fssportal.com/api/v1/room/add' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "client_id": 1856,
@@ -65,11 +67,28 @@ curl --location 'https://fssportal.com/api/v1/room/add' \
 }'
 ```
 
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/room/add', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "client_id": 1856,
+  "admin_room_id": 4,
+  "name": "Living Room"
+})
+});
+
+const data = await response.json();
+```
+
 </RequestExample>
 
 <ResponseExample>
 
-```json 200 Success
+```json Success Response
 {
   "message": "Room added successfully.",
   "data": {
@@ -78,20 +97,9 @@ curl --location 'https://fssportal.com/api/v1/room/add' \
 }
 ```
 
-```json 401 Unauthorized
-{
-  "message": "Unauthenticated."
-}
-```
-
-```json 422 Unprocessable Entity
-{
-  "message": "The client_id field is required.",
-  "errors": {
-    "client_id": ["The client_id field is required."],
-    "admin_room_id": ["The admin_room_id field is required."]
-  }
-}
-```
-
 </ResponseExample>
+
+## Notes
+
+- Authentication is required
+

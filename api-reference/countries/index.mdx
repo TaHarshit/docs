@@ -1,77 +1,77 @@
 ---
-title: "GET /countries/index — List Available Countries"
-sidebarTitle: "Countries"
-description: "GET /countries/index — Returns all supported countries with IDs and names. Use returned IDs for address fields in client records. No authentication required."
+title: Get Countries
+api: 'POST /api/v1/countries/index'
+description: Get list of available countries
 ---
 
-Use this endpoint to fetch the list of countries supported by FSS Measurement. The returned `id` and `name` values are used when populating address fields in client and lead source records. This is a public endpoint — no authentication is required, so you can call it before a user logs in, such as during registration or address entry flows.
+# Get Countries
+
+Get a list of all available countries.
 
 ## Endpoint
 
 ```
-GET https://fssportal.com/api/v1/countries/index
+POST /api/v1/countries/index
 ```
 
-<Info>This endpoint does not require authentication. You do not need to include an `Authorization` header.</Info>
+<Note>This endpoint does not require authentication</Note>
 
-## Request headers
+
+
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
 <ParamField header="platform" type="string" required>
-  Must be `WEB`.
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
 </ParamField>
 
-<ParamField header="api-key" type="string" required>
-  Your FSS API key. Use `FSS2023`.
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
 </ParamField>
+## Request Body
 
-<ParamField header="Content-Type" type="string" required>
-  Must be `application/json`.
-</ParamField>
+```json
+{}
+```
 
-## Request body
-
-No request body is required for this endpoint.
-
-## Response fields
+## Response
 
 <ResponseField name="status" type="string">
-  `"success"` on a successful response, or `"error"` if the request could not be fulfilled.
+  Success status
 </ResponseField>
 
 <ResponseField name="data" type="array">
-  An array of country objects.
-  <Expandable title="Country object">
-    <ResponseField name="id" type="integer">
-      Unique identifier for the country.
-    </ResponseField>
-    <ResponseField name="name" type="string">
-      Full country name, e.g. `"United States"`.
-    </ResponseField>
-    <ResponseField name="code" type="string">
-      ISO 3166-1 alpha-2 country code, e.g. `"US"`.
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="message" type="string">
-  Error message returned when `status` is `"error"`.
+  Array of countries
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --request GET \
-  --url https://fssportal.com/api/v1/countries/index \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Content-Type: application/json'
+curl -X POST http://localhost/fss/public/api/v1/countries/index \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost/fss/public/api/v1/countries/index', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "status": "success",
   "data": [
@@ -84,17 +84,12 @@ curl --request GET \
       "id": 2,
       "name": "Canada",
       "code": "CA"
-    },
-    {
-      "id": 3,
-      "name": "United Kingdom",
-      "code": "GB"
     }
   ]
 }
 ```
 
-```json 200 (error)
+```json Error Response
 {
   "status": "error",
   "message": "Failed to fetch countries"

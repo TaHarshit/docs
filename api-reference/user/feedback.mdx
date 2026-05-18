@@ -1,74 +1,89 @@
 ---
-title: "POST /user/feedback — Submit User Feedback"
-sidebarTitle: "Feedback"
-description: "POST /user/feedback — Submit a feedback message and optional rating. Feedback is linked to your authenticated account and sent directly to the FSS team."
+title: Feedback
+api: 'POST /api/v1/user/feedback'
+description: Submit user feedback
 ---
 
-Use this endpoint to submit feedback about the FSS Measurement application. You can include a written message and an optional numeric rating. Submitted feedback is associated with your authenticated account and sent directly to the FSS team.
+# Feedback
+
+Submit feedback about the application.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/user/feedback
+POST /api/v1/user/feedback
 ```
 
-## Required headers
+<Note>This endpoint requires authentication</Note>
 
-| Header          | Value                 |
-| --------------- | --------------------- |
-| `platform`      | `WEB`                 |
-| `api-key`       | `FSS2023`             |
-| `Authorization` | `Bearer {your_token}` |
-| `Content-Type`  | `application/json`    |
 
-## Request body parameters
 
-<ParamField body="feedback" type="string" required>
-  The feedback message or support note you want to submit.
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
+## Request Body
+
+<ParamField body="feedback" type="string">
+  Feedback text
 </ParamField>
 
 <ParamField body="rating" type="integer">
-  A numeric rating from `1` (lowest) to `5` (highest).
+  Rating (1-5)
 </ParamField>
 
-## Response fields
+## Response
 
 <ResponseField name="status" type="string">
-  `"success"` when the feedback is recorded successfully.
+  Success status
 </ResponseField>
 
 <ResponseField name="data" type="object">
-  The result of the submission.
-
-  <Expandable title="data properties">
-    <ResponseField name="message" type="string">
-      A human-readable confirmation, e.g. `"Feedback submitted successfully"`.
-    </ResponseField>
-  </Expandable>
+  Response data
 </ResponseField>
-
-## Example
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/user/feedback \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "feedback": "The measurement export feature is very helpful.",
+curl -X POST http://localhost/fss/public/api/v1/user/feedback \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "feedback": "Great API!",
     "rating": 5
   }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost/fss/public/api/v1/user/feedback', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    feedback: 'Great API!',
+    rating: 5
+  })
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "status": "success",
   "data": {
@@ -77,7 +92,7 @@ curl --request POST \
 }
 ```
 
-```json 422
+```json Error Response
 {
   "status": "error",
   "message": "Validation failed"

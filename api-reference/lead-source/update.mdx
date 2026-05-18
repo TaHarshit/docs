@@ -1,204 +1,211 @@
 ---
-title: "POST /lead-source/update — Update a Lead Source"
-sidebarTitle: "Update Lead Source"
-description: "POST /lead-source/update — Update an existing lead source record by ID. Accepts name, contact details, and address fields. Returns the updated record."
+title: Update Lead Source
+api: 'POST /api/v1/lead_source/update'
+description: Update an existing lead source
 ---
-
-Use this endpoint to modify an existing lead source record. You must provide the `lead_source_id` to identify which record to update, along with the fields you want to change. The billing address fields are automatically kept in sync with the primary address fields on update. On success, the API returns the full updated record.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/lead-source/update
+POST /api/v1/lead_source/update
 ```
 
-<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+<Note>This endpoint requires authentication</Note>
 
-## Request headers
+
+
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
 <ParamField header="platform" type="string" required>
-  Must be `WEB`.
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
 </ParamField>
 
-<ParamField header="api-key" type="string" required>
-  Your FSS API key. Use `FSS2023`.
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
 </ParamField>
-
-<ParamField header="Authorization" type="string" required>
-  Bearer token from your login response. Format: `Bearer {your_token}`.
-</ParamField>
-
-<ParamField header="Content-Type" type="string" required>
-  Must be `application/json`.
-</ParamField>
-
-## Request body
+## Request Body
 
 <ParamField body="lead_source_id" type="integer" required>
-  The unique identifier of the lead source record to update. Obtain this from the `id` field in the list or add responses.
-</ParamField>
-
-<ParamField body="name" type="string" required>
-  Updated first name of the lead source contact.
-</ParamField>
-
-<ParamField body="surname" type="string" required>
-  Updated last name of the lead source contact.
-</ParamField>
-
-<ParamField body="email" type="string" required>
-  Updated email address. Must be unique within your account.
+  The unique identifier of the lead source to update.
 </ParamField>
 
 <ParamField body="company_name" type="string">
-  Updated company or organization name. Optional.
+  company name
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  name
+</ParamField>
+
+<ParamField body="surname" type="string" required>
+  surname
+</ParamField>
+
+<ParamField body="email" type="string" required>
+  email
 </ParamField>
 
 <ParamField body="phone_no" type="string">
-  Updated phone number. Optional.
+  phone no
 </ParamField>
 
 <ParamField body="address" type="string">
-  Updated street address. Optional.
+  address
 </ParamField>
 
 <ParamField body="city" type="string">
-  Updated city. Optional.
+  city
 </ParamField>
 
 <ParamField body="state" type="string">
-  Updated state or region. Optional.
+  state
 </ParamField>
 
 <ParamField body="zip_code" type="string">
-  Updated postal or ZIP code. Optional.
+  zip code
 </ParamField>
 
-## Response fields
+## Response
 
 <ResponseField name="message" type="string">
-  A human-readable status message, e.g. `"Lead Source updated successfully."`.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="object">
-  The full updated lead source record.
-  <Expandable title="Lead source object">
+  data
+  <Expandable title="data">
     <ResponseField name="id" type="integer">
-      Unique identifier of the lead source record.
+      id
     </ResponseField>
     <ResponseField name="user_id" type="integer">
-      ID of the user account that owns this record.
+      user id
     </ResponseField>
     <ResponseField name="company_name" type="string">
-      Updated company name.
+      company name
     </ResponseField>
     <ResponseField name="name" type="string">
-      Updated first name.
+      name
     </ResponseField>
     <ResponseField name="surname" type="string">
-      Updated last name.
+      surname
     </ResponseField>
     <ResponseField name="email" type="string">
-      Updated email address.
+      email
     </ResponseField>
     <ResponseField name="phone_no" type="string">
-      Updated phone number.
+      phone no
     </ResponseField>
     <ResponseField name="address" type="string">
-      Updated street address.
+      address
     </ResponseField>
     <ResponseField name="city" type="string">
-      Updated city.
+      city
     </ResponseField>
     <ResponseField name="state" type="string">
-      Updated state or region.
+      state
     </ResponseField>
     <ResponseField name="zip_code" type="string">
-      Updated ZIP code.
+      zip code
     </ResponseField>
     <ResponseField name="billing_address" type="string">
-      Billing street address, synced from `address`.
+      billing address
     </ResponseField>
     <ResponseField name="billing_city" type="string">
-      Billing city, synced from `city`.
+      billing city
     </ResponseField>
     <ResponseField name="billing_state" type="string">
-      Billing state, synced from `state`.
+      billing state
     </ResponseField>
     <ResponseField name="billing_zip_code" type="string">
-      Billing ZIP code, synced from `zip_code`.
+      billing zip code
     </ResponseField>
     <ResponseField name="created_at" type="string">
-      ISO 8601 timestamp of when the record was originally created.
+      created at
     </ResponseField>
     <ResponseField name="updated_at" type="string">
-      ISO 8601 timestamp of this update.
-    </ResponseField>
-  </Expandable>
+      updated at
+    </ResponseField>  </Expandable>
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/lead-source/update \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "lead_source_id": 68,
-    "company_name": "Acme Corp",
-    "name": "John",
-    "surname": "Doe",
-    "email": "john.doe.updated@example.com",
-    "phone_no": "5559876543",
-    "address": "123 Main Street",
-    "city": "Dallas",
-    "state": "Texas",
-    "zip_code": "75201"
-  }'
+curl --location 'http://fssportal.com/api/v1/lead_source/update' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "lead_source_id": 68,
+  "company_name": "Test Company",
+  "name": "John",
+  "surname": "Doe",
+  "email": "john.doe2@example.com",
+  "phone_no": "9876543210",
+  "address": "123 Main Street",
+  "city": "Rajkot",
+  "state": "Gujarat",
+  "zip_code": "360006"
+}'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/lead_source/update', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "lead_source_id": 68,
+  "company_name": "Test Company",
+  "name": "John",
+  "surname": "Doe",
+  "email": "john.doe2@example.com",
+  "phone_no": "9876543210",
+  "address": "123 Main Street",
+  "city": "Rajkot",
+  "state": "Gujarat",
+  "zip_code": "360006"
+})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "message": "Lead Source updated successfully.",
   "data": {
     "id": 68,
     "user_id": 68,
-    "company_name": "Acme Corp",
+    "company_name": "Test Company",
     "name": "John",
     "surname": "Doe",
-    "email": "john.doe.updated@example.com",
-    "phone_no": "5559876543",
+    "email": "john.doe2@example.com",
+    "phone_no": "9876543210",
     "address": "123 Main Street",
-    "city": "Dallas",
-    "state": "Texas",
-    "zip_code": "75201",
+    "city": "Rajkot",
+    "state": "Gujarat",
+    "zip_code": "360006",
     "billing_address": "123 Main Street",
-    "billing_city": "Dallas",
-    "billing_state": "Texas",
-    "billing_zip_code": "75201",
+    "billing_city": "Rajkot",
+    "billing_state": "Gujarat",
+    "billing_zip_code": "360006",
     "created_at": "2025-05-23T15:52:50.000000Z",
     "updated_at": "2026-05-14T11:36:31.000000Z"
   }
 }
 ```
 
-```json 404
-{
-  "message": "Lead source not found."
-}
-```
-
-```json 401
-{
-  "message": "Unauthenticated."
-}
-```
-
 </ResponseExample>
+
+## Notes
+
+- Authentication is required
+

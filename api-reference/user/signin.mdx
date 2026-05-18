@@ -1,61 +1,148 @@
 ---
-title: "POST /user/signin — Authenticate and Get Token"
-sidebarTitle: "Sign In"
-description: "POST /user/signin — Authenticate with email and password. Returns an API Bearer token to use in subsequent authenticated requests."
+title: 'Sign In'
+api: 'POST /api/v1/user/signin'
+description: 'Authenticate user and get access token'
 ---
-
-Use this endpoint to authenticate an existing user with their email and password. A successful response includes an `api_token` that you must include as a Bearer token in the `Authorization` header on all subsequent authenticated requests.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/user/signin
+POST /api/v1/user/signin
 ```
 
-## Request headers
 
-| Header | Value | Required |
-|---|---|---|
-| `api-key` | `FSS2023` | Yes |
-| `platform` | `WEB`, `IOS`, or `ANDROID` | Yes |
-| `Content-Type` | `application/json` | Yes |
 
-## Request body
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+## Request Body
 
 <ParamField body="email" type="string" required>
-  The registered email address for the account.
+  Registered email address.
 </ParamField>
 
 <ParamField body="password" type="string" required>
-  The account password.
+  User account password.
 </ParamField>
 
 <ParamField body="device_token" type="string">
-  A push-notification device token. Optional, but recommended for mobile clients to receive notifications.
+  Device token for push notifications
 </ParamField>
 
 <ParamField body="platform" type="string" required>
-  The client platform: `WEB`, `IOS`, or `ANDROID`.
+  Platform identifier: IOS, ANDROID, or WEB
 </ParamField>
 
-## Example request
+## Response
 
-```bash
-curl --location 'https://fssportal.com/api/v1/user/signin' \
-  --header 'api-key: FSS2023' \
-  --header 'platform: WEB' \
-  --header 'Content-Type: application/json' \
-  --data-raw '{
+<ResponseField name="message" type="string">
+  Success message
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Authentication Data">
+    <ResponseField name="api_token" type="string">
+      Bearer token for authentication
+    </ResponseField>
+    <ResponseField name="user" type="object">
+      Complete user profile information
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --location 'http://fssportal.com/api/v1/user/signin' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
     "email": "john.doe@example.com",
     "password": "SecurePass123",
     "device_token": "",
     "platform": "WEB"
-  }'
+}'
 ```
 
-## Success response — 200 OK
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/user/signin', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    email: 'john.doe@example.com',
+    password: 'SecurePass123',
+    device_token: '',
+    platform: 'WEB'
+  })
+});
 
-```json
+const data = await response.json();
+console.log('Token:', data.data.api_token);
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'http://fssportal.com/api/v1/user/signin',
+    headers={
+        'X-API-Token': 'YOUR_API_TOKEN',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'email': 'john.doe@example.com',
+        'password': 'SecurePass123',
+        'device_token': '',
+        'platform': 'WEB'
+    }
+)
+
+data = response.json()
+token = data['data']['api_token']
+```
+
+```php PHP
+<?php
+
+$curl = curl_init();
+
+curl_setopt_array($curl, [
+  CURLOPT_URL => 'http://fssportal.com/api/v1/user/signin',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_POST => true,
+  CURLOPT_HTTPHEADER => [
+    'X-API-Token: YOUR_API_TOKEN',
+    'Content-Type: application/json'
+  ],
+  CURLOPT_POSTFIELDS => json_encode([
+    'email' => 'john.doe@example.com',
+    'password' => 'SecurePass123',
+    'device_token' => '',
+    'platform' => 'WEB'
+  ])
+]);
+
+$response = curl_exec($curl);
+curl_close($curl);
+
+$data = json_decode($response, true);
+$token = $data['data']['api_token'];
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
 {
   "message": "Login successful",
   "data": {
@@ -78,21 +165,26 @@ curl --location 'https://fssportal.com/api/v1/user/signin' \
 }
 ```
 
-<Tip>
-  Store the `api_token` securely after sign-in. Use it in the `Authorization: Bearer {api_token}` header on all subsequent requests that require authentication.
-</Tip>
-
-## Error response — 401 Invalid credentials
-
-The API returns `401` when the email or password is incorrect:
-
-```json
+```json Error Response - Invalid Credentials
 {
   "message": "Invalid email or password.",
   "status": 401
 }
 ```
 
-<Warning>
-  The account must be active (`status: 1`) to sign in. Deactivated accounts receive a `403` response. Contact support if you believe your account has been deactivated in error.
-</Warning>
+```json Error Response - Account Inactive
+{
+  "message": "Your account has been deactivated. Please contact support.",
+  "status": 403
+}
+```
+
+</ResponseExample>
+
+## Notes
+
+- Store the `api_token` securely for subsequent API requests
+- Include the token in the Authorization header: `Bearer {api_token}`
+- Device token is optional but recommended for push notifications
+- Failed login attempts may trigger rate limiting
+- Account must be active (status = 1) to sign in

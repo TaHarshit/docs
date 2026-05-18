@@ -1,99 +1,213 @@
 ---
-title: "POST /user/signup — Create New Account"
-sidebarTitle: "Sign Up"
-description: "POST /user/signup — Register a new user account. Accepts name, email, password, and optional profile image. Returns user data and API token."
+title: 'Sign Up'
+api: 'POST /api/v1/user/signup'
+description: 'Create a new user account'
 ---
-
-Use this endpoint to register a new user account. On success, the API returns a user object and an `api_token` you can use immediately for authenticated requests — no separate sign-in step is required.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/user/signup
+POST /api/v1/user/signup
 ```
 
-## Request headers
 
-| Header | Value | Required |
-|---|---|---|
-| `api-key` | `FSS2023` | Yes |
-| `platform` | `WEB`, `IOS`, or `ANDROID` | Yes |
-| `Content-Type` | `multipart/form-data` (when uploading a profile image) or `application/json` | Yes |
 
-<Note>
-  When you include a `profile_image` file, you must send the entire request as `multipart/form-data`. All other fields are submitted as form parts rather than JSON properties. When no file is included, you can use `application/json`.
-</Note>
+## Headers
 
-## Request body
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+## Request Body
 
 <ParamField body="name" type="string" required>
-  The user's full name.
+  User's full name
 </ParamField>
 
 <ParamField body="email" type="string" required>
-  A unique, valid email address. The API rejects duplicate addresses with a `422` error.
+  Must be a unique and valid email address.
+</ParamField>
+
+<ParamField body="phone_no" type="string" required>
+  User's phone number
 </ParamField>
 
 <ParamField body="password" type="string" required>
-  The account password. Must be at least 8 characters.
+  User's password (minimum 8 characters)
 </ParamField>
 
-<ParamField body="password_confirmation" type="string" required>
-  Must exactly match the value of `password`.
-</ParamField>
-
-<ParamField body="phone" type="string">
-  The user's phone number (digits only, without country code).
+<ParamField body="country_code" type="string" required>
+  Country code for phone number (e.g., "91" for India, "1" for US)
 </ParamField>
 
 <ParamField body="profile_image" type="file">
-  An optional profile photo. Accepted formats: JPEG, PNG, GIF. When provided, the request must use `multipart/form-data`.
-</ParamField>
-
-<ParamField body="company_name" type="string">
-  The ID of an existing company to join. Required when `reg_as_company` is `0`.
-</ParamField>
-
-<ParamField body="reg_as_company" type="integer" required>
-  Set to `1` to create a new independent company, or `0` to join an existing one.
-</ParamField>
-
-<ParamField body="own_company_name" type="string">
-  The display name for your new company. Required when `reg_as_company` is `1`.
-</ParamField>
-
-<ParamField body="country_code" type="string">
-  The dialing code for the phone number — for example, `1` for the US or `91` for India.
+  User's profile image (optional)
 </ParamField>
 
 <ParamField body="device_token" type="string">
-  A push-notification device token. Optional, but recommended for mobile clients.
+  Device token for push notifications
 </ParamField>
 
 <ParamField body="platform" type="string" required>
-  The client platform: `WEB`, `IOS`, or `ANDROID`.
+  Platform identifier: IOS, ANDROID, or WEB
 </ParamField>
 
-## Example request
+<ParamField body="company_name" type="string">
+  Required if reg_as_company is 0.
+</ParamField>
 
-```bash
-curl --location 'https://fssportal.com/api/v1/user/signup' \
-  --header 'api-key: FSS2023' \
-  --header 'platform: WEB' \
-  --form 'name="John Doe"' \
-  --form 'email="john.doe@example.com"' \
-  --form 'password="SecurePass123"' \
-  --form 'password_confirmation="SecurePass123"' \
-  --form 'country_code="1"' \
-  --form 'phone="9173304645"' \
-  --form 'reg_as_company="1"' \
-  --form 'own_company_name="Doe Window Treatments"' \
-  --form 'platform="WEB"'
+<ParamField body="reg_as_company" type="integer" required>
+  0 for Company User, 1 for Independent User.
+</ParamField>
+
+<ParamField body="own_company_name" type="string">
+  New company name (required if reg_as_company = 1)
+</ParamField>
+
+## Response
+
+<ResponseField name="message" type="string">
+  Success message
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="User Data">
+    <ResponseField name="api_token" type="string">
+      Bearer token for authentication
+    </ResponseField>
+    <ResponseField name="user" type="object">
+      <Expandable title="User Object">
+        <ResponseField name="id" type="integer">
+          User ID
+        </ResponseField>
+        <ResponseField name="name" type="string">
+          User's full name
+        </ResponseField>
+        <ResponseField name="email" type="string">
+          User's email
+        </ResponseField>
+        <ResponseField name="phone_no" type="string">
+          User's phone number
+        </ResponseField>
+        <ResponseField name="profile_image" type="string">
+          URL to profile image
+        </ResponseField>
+        <ResponseField name="company_name" type="string">
+          Company ID
+        </ResponseField>
+        <ResponseField name="own_company_name" type="string">
+          Company name
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --location 'http://fssportal.com/api/v1/user/signup' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: multipart/form-data' \
+--form 'name="John Doe"' \
+--form 'email="john.doe@example.com"' \
+--form 'phone_no="9173304645"' \
+--form 'password="SecurePass123"' \
+--form 'country_code="1"' \
+--form 'device_token="device_token_here"' \
+--form 'platform="WEB"' \
+--form 'reg_as_company="1"' \
+--form 'own_company_name="Doe Window Treatments"'
 ```
 
-## Success response — 201 Created
+```javascript JavaScript
+const formData = new FormData();
+formData.append('name', 'John Doe');
+formData.append('email', 'john.doe@example.com');
+formData.append('phone_no', '9173304645');
+formData.append('password', 'SecurePass123');
+formData.append('country_code', '1');
+formData.append('device_token', 'device_token_here');
+formData.append('platform', 'WEB');
+formData.append('reg_as_company', '1');
+formData.append('own_company_name', 'Doe Window Treatments');
 
-```json
+const response = await fetch('http://fssportal.com/api/v1/user/signup', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN'
+  },
+  body: formData
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+files = {
+    'name': (None, 'John Doe'),
+    'email': (None, 'john.doe@example.com'),
+    'phone_no': (None, '9173304645'),
+    'password': (None, 'SecurePass123'),
+    'country_code': (None, '1'),
+    'device_token': (None, 'device_token_here'),
+    'platform': (None, 'WEB'),
+    'reg_as_company': (None, '1'),
+    'own_company_name': (None, 'Doe Window Treatments')
+}
+
+response = requests.post(
+    'http://fssportal.com/api/v1/user/signup',
+    headers={
+        'X-API-Token': 'YOUR_API_TOKEN'
+    },
+    files=files
+)
+
+data = response.json()
+```
+
+```php PHP
+<?php
+
+$curl = curl_init();
+
+curl_setopt_array($curl, [
+  CURLOPT_URL => 'http://fssportal.com/api/v1/user/signup',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_POST => true,
+  CURLOPT_HTTPHEADER => [
+    'X-API-Token: YOUR_API_TOKEN'
+  ],
+  CURLOPT_POSTFIELDS => [
+    'name' => 'John Doe',
+    'email' => 'john.doe@example.com',
+    'phone_no' => '9173304645',
+    'password' => 'SecurePass123',
+    'country_code' => '1',
+    'device_token' => 'device_token_here',
+    'platform' => 'WEB',
+    'reg_as_company' => '1',
+    'own_company_name' => 'Doe Window Treatments'
+  ]
+]);
+
+$response = curl_exec($curl);
+curl_close($curl);
+
+$data = json_decode($response, true);
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
 {
   "message": "User registered successfully",
   "data": {
@@ -116,15 +230,7 @@ curl --location 'https://fssportal.com/api/v1/user/signup' \
 }
 ```
 
-<Tip>
-  Store the returned `api_token` securely (for example, in an encrypted keychain or secure storage). Pass it as `Authorization: Bearer {api_token}` on all subsequent authenticated requests.
-</Tip>
-
-## Error response — 422 Validation error
-
-The API returns a `422` status with a field-keyed `errors` object when validation fails:
-
-```json
+```json Error Response - Validation
 {
   "message": "The given data was invalid.",
   "errors": {
@@ -138,3 +244,16 @@ The API returns a `422` status with a field-keyed `errors` object when validatio
   "status": 422
 }
 ```
+
+</ResponseExample>
+
+## Notes
+
+- Email must be unique across all users
+- Password must be at least 8 characters
+- Profile image is optional but recommended
+- Device token is used for push notifications
+- Company registration:
+  - Set `reg_as_company=1` to create your own company
+  - Set `reg_as_company=0` to join an existing company (requires `company_name`)
+- After successful signup, use the returned `api_token` for authenticated requests

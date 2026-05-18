@@ -1,202 +1,205 @@
 ---
-title: "POST /lead-source/add — Create a Lead Source"
-sidebarTitle: "Add Lead Source"
-description: "POST /lead-source/add — Create a new lead source label to categorize where your clients come from, such as referral or social media."
+title: Create Lead Source
+api: 'POST /api/v1/lead_source/add'
+description: Create a new lead source
 ---
-
-Use this endpoint to create a new lead source record in your account. A lead source represents a contact or organization that refers clients to you — for example, a realtor, a social media channel, or a direct referral. The `email` field must be unique. On success, the API returns the newly created record, including the auto-assigned `id` and timestamps.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/lead-source/add
+POST /api/v1/lead_source/add
 ```
 
-<Note>This endpoint requires authentication. Include your Bearer token in the `Authorization` header.</Note>
+<Note>This endpoint requires authentication</Note>
 
-## Request headers
+
+
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
 <ParamField header="platform" type="string" required>
-  Must be `WEB`.
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
 </ParamField>
 
-<ParamField header="api-key" type="string" required>
-  Your FSS API key. Use `FSS2023`.
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
 </ParamField>
+## Request Body
 
-<ParamField header="Authorization" type="string" required>
-  Bearer token from your login response. Format: `Bearer {your_token}`.
+<ParamField body="company_name" type="string">
+  company name
 </ParamField>
-
-<ParamField header="Content-Type" type="string" required>
-  Must be `application/json`.
-</ParamField>
-
-## Request body
 
 <ParamField body="name" type="string" required>
-  First name of the lead source contact.
+  name
 </ParamField>
 
 <ParamField body="surname" type="string" required>
-  Last name of the lead source contact.
+  surname
 </ParamField>
 
 <ParamField body="email" type="string" required>
-  Email address of the lead source contact. Must be unique within your account.
-</ParamField>
-
-<ParamField body="company_name" type="string">
-  Company or organization name. Optional.
+  Unique email for the lead source.
 </ParamField>
 
 <ParamField body="phone_no" type="string">
-  Phone number for the lead source contact. Optional.
+  phone no
 </ParamField>
 
 <ParamField body="address" type="string">
-  Street address. Optional. Also used as the billing address if no separate billing address is provided.
+  address
 </ParamField>
 
 <ParamField body="city" type="string">
-  City. Optional.
+  city
 </ParamField>
 
 <ParamField body="state" type="string">
-  State or region. Optional.
+  state
 </ParamField>
 
 <ParamField body="zip_code" type="string">
-  Postal or ZIP code. Optional.
+  zip code
 </ParamField>
 
-## Response fields
+## Response
 
 <ResponseField name="message" type="string">
-  A human-readable status message, e.g. `"Lead Source added successfully."`.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="object">
-  The newly created lead source record.
-  <Expandable title="Lead source object">
-    <ResponseField name="id" type="integer">
-      Unique identifier assigned to the new record.
-    </ResponseField>
+  data
+  <Expandable title="data">
     <ResponseField name="user_id" type="integer">
-      ID of the authenticated user who created this record.
+      user id
     </ResponseField>
     <ResponseField name="company_name" type="string">
-      Company name as provided.
+      company name
     </ResponseField>
     <ResponseField name="name" type="string">
-      First name as provided.
+      name
     </ResponseField>
     <ResponseField name="surname" type="string">
-      Last name as provided.
+      surname
     </ResponseField>
     <ResponseField name="email" type="string">
-      Email address as provided.
+      email
     </ResponseField>
     <ResponseField name="phone_no" type="string">
-      Phone number as provided.
+      phone no
     </ResponseField>
     <ResponseField name="address" type="string">
-      Street address as provided.
+      address
     </ResponseField>
     <ResponseField name="city" type="string">
-      City as provided.
+      city
     </ResponseField>
     <ResponseField name="state" type="string">
-      State as provided.
+      state
     </ResponseField>
     <ResponseField name="zip_code" type="string">
-      ZIP code as provided.
+      zip code
     </ResponseField>
     <ResponseField name="billing_address" type="string">
-      Billing street address. Copied from `address` on creation.
+      billing address
     </ResponseField>
     <ResponseField name="billing_city" type="string">
-      Billing city. Copied from `city` on creation.
+      billing city
     </ResponseField>
     <ResponseField name="billing_state" type="string">
-      Billing state. Copied from `state` on creation.
+      billing state
     </ResponseField>
     <ResponseField name="billing_zip_code" type="string">
-      Billing ZIP code. Copied from `zip_code` on creation.
-    </ResponseField>
-    <ResponseField name="created_at" type="string">
-      ISO 8601 timestamp of when the record was created.
+      billing zip code
     </ResponseField>
     <ResponseField name="updated_at" type="string">
-      ISO 8601 timestamp of the most recent update.
+      updated at
     </ResponseField>
-  </Expandable>
+    <ResponseField name="created_at" type="string">
+      created at
+    </ResponseField>
+    <ResponseField name="id" type="integer">
+      id
+    </ResponseField>  </Expandable>
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/lead-source/add \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "company_name": "Acme Corp",
-    "name": "John",
-    "surname": "Doe",
-    "email": "john.doe@example.com",
-    "phone_no": "5559876543",
-    "address": "123 Main Street",
-    "city": "Dallas",
-    "state": "Texas",
-    "zip_code": "75201"
-  }'
+curl --location 'http://fssportal.com/api/v1/lead_source/add' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "company_name": "Test Company",
+  "name": "John",
+  "surname": "Doe",
+  "email": "john.doe@example.com",
+  "phone_no": "9876543210",
+  "address": "123 Main Street",
+  "city": "Rajkot",
+  "state": "Gujarat",
+  "zip_code": "360006"
+}'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/lead_source/add', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "company_name": "Test Company",
+  "name": "John",
+  "surname": "Doe",
+  "email": "john.doe@example.com",
+  "phone_no": "9876543210",
+  "address": "123 Main Street",
+  "city": "Rajkot",
+  "state": "Gujarat",
+  "zip_code": "360006"
+})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "message": "Lead Source added successfully.",
   "data": {
-    "id": 195,
     "user_id": 68,
-    "company_name": "Acme Corp",
+    "company_name": "Test Company",
     "name": "John",
     "surname": "Doe",
     "email": "john.doe@example.com",
-    "phone_no": "5559876543",
+    "phone_no": "9876543210",
     "address": "123 Main Street",
-    "city": "Dallas",
-    "state": "Texas",
-    "zip_code": "75201",
+    "city": "Rajkot",
+    "state": "Gujarat",
+    "zip_code": "360006",
     "billing_address": "123 Main Street",
-    "billing_city": "Dallas",
-    "billing_state": "Texas",
-    "billing_zip_code": "75201",
+    "billing_city": "Rajkot",
+    "billing_state": "Gujarat",
+    "billing_zip_code": "360006",
+    "updated_at": "2026-05-14T11:34:45.000000Z",
     "created_at": "2026-05-14T11:34:45.000000Z",
-    "updated_at": "2026-05-14T11:34:45.000000Z"
+    "id": 195
   }
-}
-```
-
-```json 422
-{
-  "message": "The email has already been taken.",
-  "errors": {
-    "email": ["The email has already been taken."]
-  }
-}
-```
-
-```json 401
-{
-  "message": "Unauthenticated."
 }
 ```
 
 </ResponseExample>
+
+## Notes
+
+- Authentication is required
+

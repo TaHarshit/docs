@@ -1,44 +1,41 @@
 ---
-title: "Authenticate with the FSS Measurement API"
-description: "Understand the two-layer auth model, learn how to obtain a Bearer token, include it in requests, and handle authentication errors."
+title: 'Authentication'
+description: 'Learn how to authenticate with the FSS Measurement API'
 ---
 
-The FSS Measurement API uses a two-layer authentication model. Every request — including public ones — must include a static `api-key` header that identifies the calling platform. Protected endpoints additionally require a per-user Bearer token obtained by signing in. This design lets you call public routes freely while keeping user data and account operations secure behind token verification.
+## Overview
 
-## Required headers
+The FSS Measurement API uses a combination of API keys and Bearer tokens for authentication. All API requests must include proper authentication headers.
 
-The following headers apply to all requests. The `Authorization` header is only required on protected routes.
+## Required Headers
+
+Every API request must include the following headers:
 
 | Header | Value | Description |
-|---|---|---|
-| `platform` | `WEB`, `IOS`, or `ANDROID` | Identifies the client platform making the request |
-| `api-key` | `FSS2023` | Static key required on every request, including public routes |
-| `Content-Type` | `application/json` | Declares the request body format |
-| `Accept` | `application/json` | Requests a JSON-formatted response |
-| `Authorization` | `Bearer {token}` | Per-user token required on all protected routes |
+|--------|-------|-------------|
+| `platform` | `WEB`, `IOS`, or `ANDROID` | Platform identifier |
+| `api-key` | `FSS2023` | Static API key for basic authentication |
+| `Content-Type` | `application/json` | Content type for request body |
+| `Accept` | `application/json` | Expected response format |
+| `Authorization` | `Bearer {token}` | User authentication token (for protected routes) |
 
-<Note>
-  The `api-key` value `FSS2023` is a shared platform key, not a secret credential. Your Bearer token — obtained after sign-in — is the user-specific secret that must be kept secure.
-</Note>
-
-## Authentication flow
+## Authentication Flow
 
 <Steps>
-  <Step title="Call public endpoints freely">
-    Public routes do not require a Bearer token. Include only the static headers: `platform`, `api-key`, `Content-Type`, and `Accept`.
-
+  <Step title="Public Endpoints">
+    Some endpoints like signup, signin, and forgot password don't require a Bearer token:
+    
     ```bash
     curl --location 'http://fssportal.com/api/v1/user/signup' \
     --header 'platform: WEB' \
     --header 'api-key: FSS2023' \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/json'
+    --header 'Content-Type: application/json'
     ```
   </Step>
-
-  <Step title="Sign in to get your Bearer token">
-    Call `/user/signin` with your credentials. The response contains `data.api_token` — this is your Bearer token for all subsequent authenticated requests.
-
+  
+  <Step title="Get Authentication Token">
+    Sign in to receive your Bearer token:
+    
     ```bash
     curl --location 'http://fssportal.com/api/v1/user/signin' \
     --header 'platform: WEB' \
@@ -51,37 +48,129 @@ The following headers apply to all requests. The `Authorization` header is only 
         "platform": "WEB"
     }'
     ```
-
-    Success response:
-
+    
+    Response:
     ```json
     {
       "message": "Login successful",
       "data": {
         "api_token": "abc123def456...",
-        "user": { }
+        "user": { ... }
       }
     }
     ```
   </Step>
-
-  <Step title="Use the Bearer token on protected routes">
-    Add the token to the `Authorization` header of every protected request.
-
+  
+  <Step title="Use Bearer Token">
+    Include the token in protected endpoint requests:
+    
     ```bash
     curl --location 'http://fssportal.com/api/v1/user/get_profile' \
     --header 'platform: WEB' \
     --header 'api-key: FSS2023' \
     --header 'Authorization: Bearer abc123def456...' \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/json'
+    --header 'Content-Type: application/json'
     ```
   </Step>
 </Steps>
 
-## Code examples
+## Token Management
 
-The `FSSClient` class below handles sign-in and injects the correct headers automatically on every subsequent request.
+<AccordionGroup>
+  <Accordion title="Token Expiration">
+    API tokens do not expire automatically but can be invalidated when:
+    - User changes password
+    - User logs out
+    - Account is deactivated
+    - Security breach is detected
+  </Accordion>
+  
+  <Accordion title="Token Storage">
+    **Best Practices:**
+    - Store tokens securely in environment variables
+    - Never commit tokens to version control
+    - Use secure storage mechanisms (keychain, secure storage)
+    - Implement token refresh logic in your application
+  </Accordion>
+  
+  <Accordion title="Multiple Devices">
+    Users can be authenticated on multiple devices simultaneously. Each device can have its own device token for push notifications.
+  </Accordion>
+</AccordionGroup>
+
+## Middleware & Permissions
+
+The API uses Laravel middleware for authentication and authorization:
+
+### Public Routes
+No authentication required:
+- `/user/signup`
+- `/user/signin`
+- `/user/qrcode_signin`
+- `/user/forgot_password`
+- `/user/reset_password/{token}`
+- `/user/update_password`
+- `/user/settings`
+- `/countries/index`
+- `/how-works/get`
+
+### Protected Routes
+Requires `Authorization: Bearer {token}`:
+- All client management endpoints
+- All room management endpoints
+- All measurement endpoints
+- User profile endpoints
+- Subscription endpoints
+
+### Subscription Required
+Requires active subscription:
+- Most endpoints require an active subscription plan
+- Check subscription status via `/transactions/get_user_current_plan`
+
+## Error Responses
+
+### 401 Unauthorized
+```json
+{
+  "message": "Unauthenticated.",
+  "status": 401
+}
+```
+
+### 403 Forbidden
+```json
+{
+  "message": "Subscription required.",
+  "status": 403
+}
+```
+
+### 429 Too Many Requests
+```json
+{
+  "message": "Too many requests. Please try again later.",
+  "status": 429
+}
+```
+
+## Security Best Practices
+
+<CardGroup cols={2}>
+  <Card title="HTTPS Only" icon="lock">
+    Always use HTTPS for API requests to ensure data encryption in transit
+  </Card>
+  <Card title="Secure Storage" icon="shield">
+    Store API tokens in secure, encrypted storage mechanisms
+  </Card>
+  <Card title="Token Rotation" icon="rotate">
+    Implement token refresh logic and handle expired tokens gracefully
+  </Card>
+  <Card title="Rate Limiting" icon="gauge">
+    Respect rate limits (60 requests/minute) to avoid throttling
+  </Card>
+</CardGroup>
+
+## Code Examples
 
 <CodeGroup>
 
@@ -158,7 +247,7 @@ class FSSClient:
                 'platform': 'WEB'
             }
         )
-
+        
         data = response.json()
         self.token = data['data']['api_token']
         return self.token
@@ -178,7 +267,7 @@ class FSSClient:
             headers=headers,
             json=body
         )
-
+        
         return response.json()
 ```
 
@@ -196,7 +285,7 @@ class FSSClient {
 
     public function signIn($email, $password) {
         $ch = curl_init($this->baseURL . '/user/signin');
-
+        
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -211,10 +300,10 @@ class FSSClient {
             'device_token' => '',
             'platform' => 'WEB'
         ]));
-
+        
         $response = curl_exec($ch);
         curl_close($ch);
-
+        
         $data = json_decode($response, true);
         $this->token = $data['data']['api_token'];
         return $this->token;
@@ -222,7 +311,7 @@ class FSSClient {
 
     public function makeAuthenticatedRequest($endpoint, $method = 'POST', $body = null) {
         $ch = curl_init($this->baseURL . $endpoint);
-
+        
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -232,118 +321,17 @@ class FSSClient {
             'Content-Type: application/json',
             'Accept: application/json'
         ]);
-
+        
         if ($body) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
         }
-
+        
         $response = curl_exec($ch);
         curl_close($ch);
-
+        
         return json_decode($response, true);
     }
 }
 ```
 
 </CodeGroup>
-
-## Token lifecycle
-
-Bearer tokens do not expire on a fixed schedule, but they are immediately invalidated when any of the following events occur:
-
-- You change your account password
-- You sign out
-- Your account is deactivated by an administrator
-- A security breach is detected on the account
-
-When a token is invalidated, any in-flight request using it will receive a `401 Unauthorized` response. Your integration should handle this by re-authenticating and retrying the request.
-
-## Route reference
-
-### Public routes
-
-These endpoints do not require a Bearer token — only the static `api-key` and `platform` headers:
-
-- `POST /user/signup`
-- `POST /user/signin`
-- `POST /user/qrcode_signin`
-- `POST /user/forgot_password`
-- `POST /user/reset_password/{token}`
-- `POST /user/update_password`
-- `GET /user/settings`
-- `GET /countries/index`
-- `GET /how-works/get`
-
-### Protected routes
-
-All of the following endpoint groups require `Authorization: Bearer {token}`:
-
-- All client management endpoints (`/client/*`)
-- All room management endpoints (`/room/*`)
-- All measurement endpoints (`/measurements/*`)
-- User profile endpoints (`/user/get_profile`, `/user/update_profile`, etc.)
-- Subscription and transaction endpoints (`/transactions/*`)
-
-### Subscription requirement
-
-Most protected endpoints also require an active subscription. If your account has no active plan, the API returns `403 Forbidden`. You can check your current plan status at any time:
-
-```
-GET /transactions/get_user_current_plan
-```
-
-<Tip>
-  Check subscription status early in your integration flow and surface a clear message to end users when their plan has lapsed, rather than letting a `403` surface unexpectedly.
-</Tip>
-
-## Error responses
-
-### 401 Unauthorized
-
-Returned when the Bearer token is missing, malformed, or has been invalidated.
-
-```json
-{
-  "message": "Unauthenticated.",
-  "status": 401
-}
-```
-
-### 403 Forbidden
-
-Returned when the token is valid but the account has no active subscription.
-
-```json
-{
-  "message": "Subscription required.",
-  "status": 403
-}
-```
-
-### 429 Too many requests
-
-Returned when you exceed 60 requests per minute.
-
-```json
-{
-  "message": "Too many requests. Please try again later.",
-  "status": 429
-}
-```
-
-## Security best practices
-
-<CardGroup cols={2}>
-  <Card title="HTTPS only" icon="lock">
-    Always use HTTPS endpoints in production to ensure your token and request data are encrypted in transit.
-  </Card>
-  <Card title="Secure storage" icon="shield">
-    Store Bearer tokens in environment variables or a secrets manager — never hard-code them in source files or commit them to version control.
-  </Card>
-  <Card title="Token rotation" icon="rotate">
-    Implement re-authentication logic so your integration recovers automatically when a token is invalidated, rather than failing silently.
-  </Card>
-  <Card title="Rate limiting" icon="gauge">
-    Track the `X-RateLimit-Remaining` response header and back off before you reach zero to avoid `429` errors disrupting your workflow.
-  </Card>
-</CardGroup>

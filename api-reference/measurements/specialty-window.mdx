@@ -1,306 +1,356 @@
 ---
-title: "POST /measurements/specialty_window — Specialty Window"
-sidebarTitle: "Specialty Window"
-description: "POST /measurements/specialty_window — Record a specialty or non-standard window measurement with shape type and custom dimensions."
+title: Specialty Window Measurement
+api: 'POST /api/v1/measurements/specialty_window_add_edit'
+description: Add/edit specialty window measurements
 ---
-
-Use this endpoint to record measurements for non-rectangular or specialty windows such as arches, trapezoids, triangles, or other custom shapes. Because specialty windows vary by geometry, the dimension fields (`a` through `l`, `w`, `r`, `w1`–`w2`, `h1`–`h2`, etc.) map to shape-specific points defined by the `window_type`. Omit or leave empty any fields that are not applicable to the selected shape. Pass `0` for `id` to create a new record, or supply an existing ID to update it.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/measurements/specialty_window_add_edit
+POST /api/v1/measurements/specialty_window_add_edit
 ```
 
-## Required Headers
+<Note>This endpoint requires authentication</Note>
 
-| Header          | Value                  |
-| --------------- | ---------------------- |
-| `platform`      | `WEB`                  |
-| `api-key`       | `FSS2023`              |
-| `Authorization` | `Bearer {your_token}`  |
-| `Content-Type`  | `application/json`     |
 
+
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
 ## Request Body
 
 <ParamField body="id" type="integer">
-  The ID of an existing measurement to update. Pass `0` to create a new record.
+  id
 </ParamField>
 
 <ParamField body="user_id" type="integer" required>
-  The ID of the user recording the measurement.
+  user id
 </ParamField>
 
 <ParamField body="client_id" type="integer" required>
-  The ID of the client this measurement belongs to.
+  client id
 </ParamField>
 
 <ParamField body="room_id" type="integer" required>
-  The ID of the room where the window is located.
+  room id
 </ParamField>
 
 <ParamField body="measurement_type_id" type="integer" required>
-  The measurement type identifier. Pass `1` for standard specialty window measurements.
-</ParamField>
-
-<ParamField body="window_name" type="string" required>
-  A descriptive label for the window, e.g. `"Entry Arch"`.
-</ParamField>
-
-<ParamField body="window_type" type="integer" required>
-  Numeric code identifying the shape of the specialty window (e.g. `1` = Arch, `2` = Quarter Circle, `3` = Trapezoid). Refer to your FSS account's shape reference for the full list.
+  measurement type id
 </ParamField>
 
 <ParamField body="unit_type" type="string" required>
-  The unit system for all dimension values. Accepted values: `"Imperial"`, `"Metrix"`.
+  unit type
 </ParamField>
 
 <ParamField body="mount_type" type="string">
-  How the covering is mounted: `"Inside"` or `"Outside"`.
+  mount type
+</ParamField>
+
+<ParamField body="window_type" type="integer" required>
+  Type of specialty window (e.g., Arch, Trapezoid).
+</ParamField>
+
+<ParamField body="window_name" type="string" required>
+  window name
 </ParamField>
 
 <ParamField body="a" type="string">
-  Shape dimension A. Meaning depends on `window_type` (e.g. base width for a trapezoid).
+  a
 </ParamField>
 
 <ParamField body="b" type="string">
-  Shape dimension B.
+  b
 </ParamField>
 
 <ParamField body="c" type="string">
-  Shape dimension C.
+  c
 </ParamField>
 
 <ParamField body="d" type="string">
-  Shape dimension D.
+  d
 </ParamField>
 
 <ParamField body="e" type="string">
-  Shape dimension E.
+  e
 </ParamField>
 
 <ParamField body="f" type="string">
-  Shape dimension F.
+  f
 </ParamField>
 
 <ParamField body="g" type="string">
-  Shape dimension G.
+  g
 </ParamField>
 
 <ParamField body="h" type="string">
-  Shape dimension H.
+  h
 </ParamField>
 
 <ParamField body="i" type="string">
-  Shape dimension I.
+  i
 </ParamField>
 
 <ParamField body="j" type="string">
-  Shape dimension J.
+  j
 </ParamField>
 
 <ParamField body="k" type="string">
-  Shape dimension K.
+  k
 </ParamField>
 
 <ParamField body="l" type="string">
-  Shape dimension L.
+  l
 </ParamField>
 
 <ParamField body="w" type="string">
-  Overall width of the specialty window opening.
+  w
 </ParamField>
 
 <ParamField body="r" type="string">
-  Radius measurement, used for arched or circular window shapes.
+  r
 </ParamField>
 
 <ParamField body="w1" type="string">
-  Secondary width measurement for compound shapes.
+  w1
 </ParamField>
 
 <ParamField body="h1" type="string">
-  Primary height measurement for the shape.
+  h1
 </ParamField>
 
 <ParamField body="d1" type="string">
-  Primary depth measurement for the shape.
+  d1
 </ParamField>
 
 <ParamField body="x1" type="string">
-  Horizontal offset or inset measurement, point 1.
+  x1
 </ParamField>
 
 <ParamField body="b1" type="string">
-  Secondary base measurement, point 1.
+  b1
 </ParamField>
 
 <ParamField body="w2" type="string">
-  Tertiary width measurement for compound shapes.
+  w2
 </ParamField>
 
 <ParamField body="h2" type="string">
-  Secondary height measurement for the shape.
+  h2
 </ParamField>
 
 <ParamField body="d2" type="string">
-  Secondary depth measurement for the shape.
+  d2
 </ParamField>
 
 <ParamField body="x2" type="string">
-  Horizontal offset or inset measurement, point 2.
+  x2
 </ParamField>
 
 <ParamField body="b2" type="string">
-  Secondary base measurement, point 2.
-</ParamField>
-
-<ParamField body="for_shutter" type="string">
-  Indicates whether this measurement is for a shutter product.
-</ParamField>
-
-<ParamField body="square_feet" type="string">
-  Calculated or estimated square footage of the window area.
+  b2
 </ParamField>
 
 <ParamField body="focus_width" type="string">
-  Solatech Focus integration width value.
+  focus width
 </ParamField>
 
 <ParamField body="focus_width_key" type="string">
-  Key identifier for the Solatech Focus width field.
+  focus width key
 </ParamField>
 
 <ParamField body="focus_height" type="string">
-  Solatech Focus integration height value.
+  focus height
 </ParamField>
 
 <ParamField body="focus_height_key" type="string">
-  Key identifier for the Solatech Focus height field.
+  focus height key
 </ParamField>
 
-<ParamField body="offset_value" type="string">
-  Offset adjustment value applied to the measurement.
+<ParamField body="for_shutter" type="string">
+  for shutter
 </ParamField>
 
-<ParamField body="offset_value_keys" type="string">
-  Keys identifying which fields the offset applies to.
+<ParamField body="square_feet" type="string">
+  square feet
 </ParamField>
 
 <ParamField body="min_value_fields" type="string">
-  Minimum value constraints for specific dimension fields.
+  min value fields
 </ParamField>
 
 <ParamField body="note" type="string">
-  Free-text notes about this measurement or installation context.
+  note
+</ParamField>
+
+<ParamField body="offset_value" type="string">
+  offset value
+</ParamField>
+
+<ParamField body="offset_value_keys" type="string">
+  offset value keys
 </ParamField>
 
 <ParamField body="installation_instructions" type="string">
-  Specific installation instructions for this window.
+  installation instructions
 </ParamField>
 
 <ParamField body="total_custom_fields" type="integer">
-  The count of custom fields included in `custom_field`.
+  total custom fields
 </ParamField>
 
 <ParamField body="custom_field" type="object">
-  A key-value map of custom measurement fields defined for your account. Pass an empty array `[]` when unused.
+  custom field
 </ParamField>
 
 ## Response
 
 <ResponseField name="message" type="string">
-  A human-readable confirmation, e.g. `"Measurement added successfully!"`.
+  message
 </ResponseField>
-
 <ResponseField name="data" type="array">
-  An empty array on success. Populated with error detail when validation fails.
+  data
 </ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/measurements/specialty_window_add_edit \
-  --header "platform: WEB" \
-  --header "api-key: FSS2023" \
-  --header "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  --header "Content-Type: application/json" \
-  --data '{
-    "id": 0,
-    "user_id": 68,
-    "client_id": 1856,
-    "room_id": 4945,
-    "measurement_type_id": 1,
-    "window_name": "Entry Arch",
-    "window_type": 1,
-    "unit_type": "Imperial",
-    "mount_type": "Outside",
-    "a": "48.00",
-    "b": "24.00",
-    "c": "",
-    "d": "",
-    "e": "",
-    "f": "",
-    "g": "",
-    "h": "",
-    "i": "",
-    "j": "",
-    "k": "",
-    "l": "",
-    "w": "48.00",
-    "r": "24.00",
-    "w1": "",
-    "h1": "36.00",
-    "d1": "",
-    "x1": "",
-    "b1": "",
-    "w2": "",
-    "h2": "",
-    "d2": "",
-    "x2": "",
-    "b2": "",
-    "for_shutter": "",
-    "square_feet": "10.00",
-    "focus_width": "",
-    "focus_width_key": "",
-    "focus_height": "",
-    "focus_height_key": "",
-    "offset_value": "",
-    "offset_value_keys": "",
-    "min_value_fields": "",
-    "note": "Full-arch transom above front door",
-    "installation_instructions": "Outside mount, extend 2 inches beyond frame on each side",
-    "total_custom_fields": 0,
-    "custom_field": []
-  }'
+curl --location 'http://fssportal.com/api/v1/measurements/specialty_window_add_edit' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "id": 0,
+  "user_id": 68,
+  "client_id": 1856,
+  "room_id": 4945,
+  "measurement_type_id": 1,
+  "unit_type": "metrix",
+  "mount_type": "",
+  "window_type": 3,
+  "window_name": "test",
+  "a": "",
+  "b": "",
+  "c": "",
+  "d": "",
+  "e": "",
+  "f": "",
+  "g": "",
+  "h": "",
+  "i": "",
+  "j": "",
+  "k": "",
+  "l": "",
+  "w": "",
+  "r": "",
+  "w1": "",
+  "h1": "",
+  "d1": "",
+  "x1": "",
+  "b1": "",
+  "w2": "",
+  "h2": "",
+  "d2": "",
+  "x2": "",
+  "b2": "",
+  "focus_width": "",
+  "focus_width_key": "",
+  "focus_height": "",
+  "focus_height_key": "",
+  "for_shutter": "",
+  "square_feet": "",
+  "min_value_fields": "",
+  "note": "",
+  "offset_value": "",
+  "offset_value_keys": "",
+  "installation_instructions": "",
+  "total_custom_fields": 0,
+  "custom_field": []
+}'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/measurements/specialty_window_add_edit', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "id": 0,
+  "user_id": 68,
+  "client_id": 1856,
+  "room_id": 4945,
+  "measurement_type_id": 1,
+  "unit_type": "metrix",
+  "mount_type": "",
+  "window_type": 3,
+  "window_name": "test",
+  "a": "",
+  "b": "",
+  "c": "",
+  "d": "",
+  "e": "",
+  "f": "",
+  "g": "",
+  "h": "",
+  "i": "",
+  "j": "",
+  "k": "",
+  "l": "",
+  "w": "",
+  "r": "",
+  "w1": "",
+  "h1": "",
+  "d1": "",
+  "x1": "",
+  "b1": "",
+  "w2": "",
+  "h2": "",
+  "d2": "",
+  "x2": "",
+  "b2": "",
+  "focus_width": "",
+  "focus_width_key": "",
+  "focus_height": "",
+  "focus_height_key": "",
+  "for_shutter": "",
+  "square_feet": "",
+  "min_value_fields": "",
+  "note": "",
+  "offset_value": "",
+  "offset_value_keys": "",
+  "installation_instructions": "",
+  "total_custom_fields": 0,
+  "custom_field": []
+})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200 Success
+```json Success Response
 {
   "message": "Measurement added successfully!",
   "data": []
 }
 ```
 
-```json 422 Validation Error
-{
-  "message": "The given data was invalid.",
-  "errors": {
-    "window_type": ["The window type field is required."],
-    "client_id": ["The client id field is required."]
-  }
-}
-```
-
-```json 401 Unauthorized
-{
-  "message": "Unauthenticated."
-}
-```
-
 </ResponseExample>
+
+## Notes
+
+- Authentication is required

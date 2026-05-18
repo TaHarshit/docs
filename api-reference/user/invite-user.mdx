@@ -1,87 +1,99 @@
 ---
-title: "POST /user/invite — Invite a Team Member"
-sidebarTitle: "Invite User"
-description: "POST /user/invite — Send an invitation email to add a team member to your FSS account. Once accepted, the invitee can collaborate on measurements and projects."
+title: Invite User
+api: 'POST /api/v1/user/invite_user'
+description: Invite a user to your company
 ---
 
-Use this endpoint to invite a new user to join your FSS Measurement company account. The API sends an invitation email to the specified address. Once accepted, the invitee is added to your company and can collaborate on measurements and projects.
+# Invite User
+
+Invite a new user to join your company.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/user/invite_user
+POST /api/v1/user/invite_user
 ```
 
-## Required headers
+<Note>This endpoint requires authentication</Note>
 
-| Header          | Value                 |
-| --------------- | --------------------- |
-| `platform`      | `WEB`                 |
-| `api-key`       | `FSS2023`             |
-| `Authorization` | `Bearer {your_token}` |
-| `Content-Type`  | `application/json`    |
 
-## Request body parameters
 
-<ParamField body="email" type="string" required>
-  The email address of the person you want to invite. An invitation email is sent to this address.
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
+## Request Body
+
+<ParamField body="email" type="string">
+  Email of user to invite
 </ParamField>
 
 <ParamField body="role" type="string">
-  The role to assign to the invitee. Accepted values: `"admin"`, `"member"`. Defaults to `"member"` if not provided.
+  User role (admin, member)
 </ParamField>
 
-## Response fields
+## Response
 
 <ResponseField name="status" type="string">
-  `"success"` when the invitation is sent successfully.
+  Success status
 </ResponseField>
 
 <ResponseField name="data" type="object">
-  Details of the sent invitation.
-
-  <Expandable title="data properties">
-    <ResponseField name="message" type="string">
-      A human-readable confirmation, e.g. `"User invited successfully"`.
-    </ResponseField>
-    <ResponseField name="invite_link" type="string">
-      The unique invitation URL sent to the invitee.
-    </ResponseField>
-  </Expandable>
+  Response data
 </ResponseField>
-
-## Example
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/user/invite_user \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "email": "newmember@example.com",
+curl -X POST http://fssportal.com/api/v1/user/invite_user \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "newuser@example.com",
     "role": "member"
   }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/user/invite_user', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    email: 'newuser@example.com',
+    role: 'member'
+  })
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "status": "success",
   "data": {
     "message": "User invited successfully",
-    "invite_link": "https://fssportal.com/api/v1/invite/token123"
+    "invite_link": "http://fssportal.com/api/v1/invite/token123"
   }
 }
 ```
 
-```json 422
+```json Error Response
 {
   "status": "error",
   "message": "User already exists"

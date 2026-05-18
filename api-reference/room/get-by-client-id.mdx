@@ -1,122 +1,78 @@
 ---
-title: "GET /room/get_by_client_id — List Rooms for a Client"
-sidebarTitle: "Rooms by Client"
-description: "GET /room/get_by_client_id — Returns all rooms for a given client ID, ordered by creation date. Use this before fetching or creating measurements."
+title: Get Room By Client ID
+api: 'POST /api/v1/room/get_by_client_id'
+description: Get room details by client ID
 ---
-
-Use this endpoint to retrieve all rooms belonging to a specific client. You provide the client ID, and the API returns every room created under that client's project, ordered by creation date. This is the primary way to enumerate rooms before fetching measurements or performing updates.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/room/get_by_client_id
+POST /api/v1/room/get-by-client-id
 ```
 
-<Note>
-  Although this endpoint retrieves data, it uses the `POST` HTTP method and accepts the client ID in the request body.
-</Note>
+<Note>This endpoint requires authentication</Note>
+
+
 
 ## Headers
 
-| Header          | Value                  | Required |
-|-----------------|------------------------|----------|
-| `platform`      | `WEB`                  | Yes      |
-| `api-key`       | `FSS2023`              | Yes      |
-| `Authorization` | `Bearer {your_token}`  | Yes      |
-| `Content-Type`  | `application/json`     | Yes      |
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
 
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
 ## Request Body
 
-<ParamField body="client_id" type="integer" required>
-  The unique ID of the client whose rooms you want to list. You can obtain client IDs from the `POST /client/list` endpoint.
+<ParamField body="client_id" type="integer">
+  client id
 </ParamField>
 
 ## Response
 
-<ResponseField name="message" type="string">
-  A human-readable status message confirming the result of the request.
-</ResponseField>
 
-<ResponseField name="data" type="array">
-  An array of room objects associated with the given client, ordered by creation date (most recent last). Each object represents one room.
-  <Expandable title="data item">
-    <ResponseField name="id" type="integer">
-      The unique ID of the room.
-    </ResponseField>
-    <ResponseField name="name" type="string">
-      The display name of the room.
-    </ResponseField>
-    <ResponseField name="admin_room_id" type="integer">
-      The ID of the predefined room type associated with this room, or `null` if none was assigned.
-    </ResponseField>
-    <ResponseField name="client_id" type="integer">
-      The ID of the client this room belongs to.
-    </ResponseField>
-    <ResponseField name="created_at" type="string">
-      ISO 8601 timestamp indicating when the room was created.
-    </ResponseField>
-  </Expandable>
-</ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --location 'https://fssportal.com/api/v1/room/get_by_client_id' \
---header 'platform: WEB' \
---header 'api-key: FSS2023' \
---header 'Authorization: Bearer {your_token}' \
+curl --location 'http://fssportal.com/api/v1/room/get-by-client-id' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "client_id": 1856
 }'
 ```
 
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/room/get-by-client-id', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "client_id": 1856
+})
+});
+
+const data = await response.json();
+```
+
 </RequestExample>
 
 <ResponseExample>
 
-```json 200 Success
-{
-  "message": "Rooms get successfully.",
-  "data": [
-    {
-      "id": 4943,
-      "name": "Kitchen",
-      "admin_room_id": 2,
-      "client_id": 1856,
-      "created_at": "2026-05-10T09:15:00.000000Z"
-    },
-    {
-      "id": 4944,
-      "name": "Dining Room",
-      "admin_room_id": 3,
-      "client_id": 1856,
-      "created_at": "2026-05-12T11:30:00.000000Z"
-    },
-    {
-      "id": 4945,
-      "name": "Living Room",
-      "admin_room_id": 4,
-      "client_id": 1856,
-      "created_at": "2026-05-14T12:01:04.000000Z"
-    }
-  ]
-}
-```
-
-```json 401 Unauthorized
-{
-  "message": "Unauthenticated."
-}
-```
-
-```json 422 Unprocessable Entity
-{
-  "message": "The client_id field is required.",
-  "errors": {
-    "client_id": ["The client_id field is required."]
-  }
-}
+```json Success Response
+null
 ```
 
 </ResponseExample>
+
+## Notes
+
+- Authentication is required

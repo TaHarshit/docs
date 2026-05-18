@@ -1,69 +1,83 @@
 ---
-title: "POST /user/delete_account — Delete Your Account"
-sidebarTitle: "Delete Account"
-description: "POST /user/delete_account — Permanently delete your account and all associated measurements, projects, and company data. This action cannot be undone."
+title: Delete Account
+api: 'POST /api/v1/user/delete_account'
+description: Delete user account
 ---
 
-Use this endpoint to permanently delete your FSS Measurement account. Once submitted, your account, all associated measurements, projects, and company data are removed and cannot be recovered.
+# Delete Account
 
-<Warning>
-  This action is irreversible. All data linked to your account — including measurements, projects, and company associations — will be permanently deleted. There is no way to undo this operation.
-</Warning>
+Permanently delete your account and all associated data.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/user/delete_account
+POST /api/v1/user/delete_account
 ```
 
-## Required headers
+<Note>This endpoint requires authentication</Note>
 
-| Header          | Value                 |
-| --------------- | --------------------- |
-| `platform`      | `WEB`                 |
-| `api-key`       | `FSS2023`             |
-| `Authorization` | `Bearer {your_token}` |
-| `Content-Type`  | `application/json`    |
+<Callout type="warning">
+This action is irreversible. All your data will be permanently deleted.
+</Callout>
 
-## Request body
 
-No request body parameters are required. Send an empty JSON object.
 
-## Response fields
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
+## Request Body
+
+```json
+{}
+```
+
+## Response
 
 <ResponseField name="status" type="string">
-  `"success"` when the account has been deleted.
+  Success status
 </ResponseField>
 
 <ResponseField name="data" type="object">
-  The result of the deletion.
-
-  <Expandable title="data properties">
-    <ResponseField name="message" type="string">
-      A human-readable confirmation, e.g. `"Account deleted successfully"`.
-    </ResponseField>
-  </Expandable>
+  Response data
 </ResponseField>
-
-## Example
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/user/delete_account \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{}'
+curl -X POST http://localhost/fss/public/api/v1/user/delete_account \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost/fss/public/api/v1/user/delete_account', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "status": "success",
   "data": {
@@ -72,7 +86,7 @@ curl --request POST \
 }
 ```
 
-```json 401
+```json Error Response
 {
   "status": "error",
   "message": "Unauthorized"

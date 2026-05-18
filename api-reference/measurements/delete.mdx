@@ -1,85 +1,78 @@
 ---
-title: "POST /measurements/delete — Delete a Measurement"
-sidebarTitle: "Delete Measurement"
-description: "POST /measurements/delete — Permanently delete a window measurement record by its ID. Applies to all measurement types. This action cannot be undone."
+title: Delete Measurement
+api: 'POST /api/v1/measurements/delete'
+description: Delete a measurement
 ---
-
-Use this endpoint to permanently delete a measurement record by its ID. This applies to all measurement types — single window, single window photo, multiple window, specialty window, series with draperies, and awning. Once deleted the record cannot be recovered, so confirm the correct `measurement_id` before calling this endpoint.
-
-<Warning>
-  **This action is permanent and cannot be undone.** Deleting a measurement removes all associated dimension data, notes, and attached images from the FSS system. There is no soft-delete or recycle bin. Verify the `measurement_id` before making this request.
-</Warning>
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/measurements/delete
+POST /api/v1/measurements/delete
 ```
 
-## Required Headers
+<Note>This endpoint requires authentication</Note>
 
-| Header          | Value                  |
-| --------------- | ---------------------- |
-| `platform`      | `WEB`                  |
-| `api-key`       | `FSS2023`              |
-| `Authorization` | `Bearer {your_token}`  |
-| `Content-Type`  | `application/json`     |
 
+
+## Headers
+
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
+</ParamField>
+
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
 ## Request Body
 
-<ParamField body="measurement_id" type="integer" required>
-  The unique ID of the measurement record to delete. You can retrieve this value from the `id` field returned by the [Get Measurements](/api-reference/measurements/get) endpoint.
+<ParamField body="measurement_id" type="integer">
+  measurement id
 </ParamField>
 
 ## Response
 
-A successful deletion returns HTTP `200` with a `null` body. No confirmation object is returned.
 
-<ResponseField name="(empty)" type="null">
-  The response body is `null` on success.
-</ResponseField>
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/measurements/delete \
-  --header "platform: WEB" \
-  --header "api-key: FSS2023" \
-  --header "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  --header "Content-Type: application/json" \
-  --data '{
-    "measurement_id": 12170
-  }'
+curl --location 'http://fssportal.com/api/v1/measurements/delete' \
+--header 'X-API-Token: YOUR_API_TOKEN' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "measurement_id": 1
+}'
+```
+
+```javascript JavaScript
+const response = await fetch('http://fssportal.com/api/v1/measurements/delete', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+  "measurement_id": 1
+})
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200 Success
+```json Success Response
 null
 ```
 
-```json 422 Validation Error
-{
-  "message": "The given data was invalid.",
-  "errors": {
-    "measurement_id": ["The measurement id field is required."]
-  }
-}
-```
-
-```json 404 Not Found
-{
-  "message": "Measurement not found."
-}
-```
-
-```json 401 Unauthorized
-{
-  "message": "Unauthenticated."
-}
-```
-
 </ResponseExample>
+
+## Notes
+
+- Authentication is required

@@ -1,50 +1,24 @@
 ---
-title: "Get Started with FSS Measurement API"
-description: "Follow step-by-step instructions to sign up, authenticate, and make your first successful FSS Measurement API call in under 5 minutes."
+title: 'Quickstart'
+description: 'Start building with FSS Measurement API in under 5 minutes'
 ---
 
-This guide walks you through everything you need to make your first successful API call. By the end, you will have a Bearer token, a verified profile request, and your first client record — all from the command line or your language of choice.
+## Setup your development environment
 
-## Prerequisites
+Learn how to integrate FSS Measurement API into your application.
 
-Before you begin, make sure you have:
+<AccordionGroup>
+  <Accordion icon="key" title="Get your API credentials">
+    1. Sign up for an account at [FSS Measurement Dashboard](https://dashboard.fss-measurement.com)
+    2. Navigate to Settings > API Keys
+    3. Generate a new API key
+    4. Store your API key securely (never commit it to version control)
+  </Accordion>
 
-- An account at [dashboard.fss-measurement.com](https://dashboard.fss-measurement.com)
-- An active subscription plan (required for protected endpoints)
-- `curl` or an HTTP client installed
-
-<Note>
-  If you do not yet have an account, complete step 1 below before proceeding to sign in.
-</Note>
-
-## Steps
-
-<Steps>
-  <Step title="Sign up for an account">
-    Create your account by sending a `POST` request to `/user/signup`. Every request — including public ones — must include the static `api-key` and `platform` headers.
+  <Accordion icon="code" title="Make your first request">
+    Test your API connection with a simple authentication request:
 
     ```bash
-    curl --location 'https://fssportal.com/api/v1/user/signup' \
-    --header 'platform: WEB' \
-    --header 'api-key: FSS2023' \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' \
-    --data-raw '{
-        "name": "Your Name",
-        "email": "your-email@example.com",
-        "password": "your-password"
-    }'
-    ```
-
-    A successful response confirms account creation. You can then sign in to receive your Bearer token.
-  </Step>
-
-  <Step title="Sign in to get a Bearer token">
-    Call `/user/signin` with your email and password. The response contains the `api_token` field you will use in all subsequent requests.
-
-    <CodeGroup>
-
-    ```bash cURL
     curl --location 'http://fssportal.com/api/v1/user/signin' \
     --header 'platform: WEB' \
     --header 'api-key: FSS2023' \
@@ -57,97 +31,10 @@ Before you begin, make sure you have:
         "platform": "WEB"
     }'
     ```
+  </Accordion>
 
-    ```javascript JavaScript
-    const FSS_API_URL = 'http://fssportal.com/api/v1';
-    const API_KEY = 'FSS2023';
-
-    async function signIn(email, password) {
-      const response = await fetch(`${FSS_API_URL}/user/signin`, {
-        method: 'POST',
-        headers: {
-          'platform': 'WEB',
-          'api-key': API_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          device_token: '',
-          platform: 'WEB'
-        })
-      });
-
-      const data = await response.json();
-      return data.data.api_token;
-    }
-    ```
-
-    ```python Python
-    import requests
-
-    FSS_API_URL = 'http://fssportal.com/api/v1'
-    API_KEY = 'FSS2023'
-
-    def sign_in(email, password):
-        response = requests.post(
-            f'{FSS_API_URL}/user/signin',
-            headers={
-                'platform': 'WEB',
-                'api-key': API_KEY,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            json={
-                'email': email,
-                'password': password,
-                'device_token': '',
-                'platform': 'WEB'
-            }
-        )
-
-        data = response.json()
-        return data['data']['api_token']
-    ```
-
-    ```php PHP
-    <?php
-
-    $fssApiUrl = 'http://fssportal.com/api/v1';
-    $apiKey = 'FSS2023';
-
-    function signIn($email, $password) {
-        global $fssApiUrl, $apiKey;
-
-        $ch = curl_init($fssApiUrl . '/user/signin');
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'platform: WEB',
-            'api-key: ' . $apiKey,
-            'Content-Type: application/json',
-            'Accept: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-            'email' => $email,
-            'password' => $password,
-            'device_token' => '',
-            'platform' => 'WEB'
-        ]));
-
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        $data = json_decode($response, true);
-        return $data['data']['api_token'];
-    }
-    ```
-
-    </CodeGroup>
-
-    A successful sign-in returns your Bearer token inside `data.api_token`:
+  <Accordion icon="check" title="Verify the response">
+    A successful response will include your API token:
 
     ```json
     {
@@ -156,78 +43,157 @@ Before you begin, make sure you have:
         "api_token": "your-bearer-token-here",
         "user": {
           "id": 1,
-          "name": "Your Name",
+          "name": "John Doe",
           "email": "your-email@example.com"
         }
       }
     }
     ```
+  </Accordion>
+</AccordionGroup>
 
-    <Warning>
-      Store `api_token` securely. Do not log it or commit it to version control. Treat it like a password.
-    </Warning>
+## Authentication Flow
+
+<Steps>
+  <Step title="Sign Up">
+    Create a new user account using the `/user/signup` endpoint
   </Step>
-
-  <Step title="Make your first authenticated request">
-    Use the token from the previous step to fetch your profile. Pass it as a Bearer token in the `Authorization` header.
-
-    ```bash
-    curl --location 'https://fssportal.com/api/v1/user/get_profile' \
-    --header 'platform: WEB' \
-    --header 'api-key: FSS2023' \
-    --header 'Authorization: Bearer your-bearer-token-here' \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/json'
-    ```
-
-    A `200` response with your profile data confirms that authentication is working correctly.
+  <Step title="Sign In">
+    Authenticate with email and password to receive an API token
   </Step>
-
-  <Step title="Add your first client">
-    With authentication verified, create your first client record by posting to `/client/add`.
-
-    ```bash
-    curl --location 'https://fssportal.com/api/v1/client/add' \
-    --header 'platform: WEB' \
-    --header 'api-key: FSS2023' \
-    --header 'Authorization: Bearer your-bearer-token-here' \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' \
-    --data-raw '{
-        "name": "Acme Corp",
-        "email": "contact@acme.com",
-        "phone": "555-0100"
-    }'
+  <Step title="Use Token">
+    Include the token in the Authorization header for all subsequent requests:
     ```
-
-    The response returns the newly created client object, including its `id`. Use this `id` when creating rooms and measurements for the client.
+    Authorization: Bearer your-api-token
+    ```
   </Step>
 </Steps>
 
-## Common use cases
+## Common Use Cases
 
 <CardGroup cols={2}>
-  <Card title="Add a client" icon="user-plus" href="/api-reference/client/add">
-    Create a new client record with contact information and project details.
+  <Card title="Add a Client" icon="user-plus" href="/api-reference/client/add">
+    Create a new client record with contact information
   </Card>
-  <Card title="Create a measurement" icon="ruler" href="/api-reference/measurements/single-window">
-    Record window measurements and associate them with a client and room.
+  <Card title="Create Measurement" icon="ruler" href="/api-reference/measurements/single-window">
+    Record window measurements for a client project
   </Card>
-  <Card title="Manage rooms" icon="door-open" href="/api-reference/room/add">
-    Organize measurements by rooms within a project for structured reporting.
+  <Card title="Manage Rooms" icon="door-open" href="/api-reference/room/add">
+    Organize measurements by rooms within a project
   </Card>
-  <Card title="Export data" icon="download" href="/api-reference/client/list">
-    Retrieve and export full client lists and associated measurement data.
+  <Card title="Export Data" icon="download" href="/api-reference/client/list">
+    Retrieve and export client data
   </Card>
 </CardGroup>
 
-## Next steps
+## SDK Examples
+
+<CodeGroup>
+
+```javascript JavaScript
+const FSS_API_URL = 'http://fssportal.com/api/v1';
+const API_KEY = 'FSS2023';
+
+async function signIn(email, password) {
+  const response = await fetch(`${FSS_API_URL}/user/signin`, {
+    method: 'POST',
+    headers: {
+      'platform': 'WEB',
+      'api-key': API_KEY,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      email,
+      password,
+      device_token: '',
+      platform: 'WEB'
+    })
+  });
+  
+  const data = await response.json();
+  return data.data.api_token;
+}
+```
+
+```python Python
+import requests
+
+FSS_API_URL = 'http://fssportal.com/api/v1'
+API_KEY = 'FSS2023'
+
+def sign_in(email, password):
+    response = requests.post(
+        f'{FSS_API_URL}/user/signin',
+        headers={
+            'platform': 'WEB',
+            'api-key': API_KEY,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        json={
+            'email': email,
+            'password': password,
+            'device_token': '',
+            'platform': 'WEB'
+        }
+    )
+    
+    data = response.json()
+    return data['data']['api_token']
+```
+
+```php PHP
+<?php
+
+$fssApiUrl = 'http://fssportal.com/api/v1';
+$apiKey = 'FSS2023';
+
+function signIn($email, $password) {
+    global $fssApiUrl, $apiKey;
+    
+    $ch = curl_init($fssApiUrl . '/user/signin');
+    
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'platform: WEB',
+        'api-key: ' . $apiKey,
+        'Content-Type: application/json',
+        'Accept: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'email' => $email,
+        'password' => $password,
+        'device_token' => '',
+        'platform' => 'WEB'
+    ]));
+    
+    $response = curl_exec($ch);
+    curl_close($ch);
+    
+    $data = json_decode($response, true);
+    return $data['data']['api_token'];
+}
+```
+
+</CodeGroup>
+
+## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Authentication guide" icon="shield" href="/authentication">
-    Understand the two-layer auth model, token lifecycle, and security best practices.
+  <Card
+    title="Authentication Guide"
+    icon="shield"
+    href="/authentication"
+  >
+    Learn about authentication methods and security
   </Card>
-  <Card title="API reference" icon="book" href="/api-reference/overview">
-    Explore every available endpoint with full request and response documentation.
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/overview"
+  >
+    Explore all available endpoints
   </Card>
 </CardGroup>

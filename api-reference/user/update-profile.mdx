@@ -1,143 +1,114 @@
 ---
-title: "POST /user/update_profile — Update Your Profile"
-sidebarTitle: "Update Profile"
-description: "POST /user/update_profile — Update your profile details including name, phone, company name, and profile image. Supports multipart/form-data for image uploads."
+title: Update Profile
+api: 'POST /api/v1/user/update_profile'
+description: Update user profile information
 ---
 
-Use this endpoint to update the profile information of the currently authenticated user. You can update one or more fields in a single request. When uploading a `profile_image`, send the request as `multipart/form-data` instead of JSON.
+# Update Profile
+
+Update your user profile information.
 
 ## Endpoint
 
 ```
-POST https://fssportal.com/api/v1/user/update_profile
+POST /api/v1/user/update_profile
 ```
 
-## Required headers
+<Note>This endpoint requires authentication</Note>
 
-| Header          | Value                                              |
-| --------------- | -------------------------------------------------- |
-| `platform`      | `WEB`                                              |
-| `api-key`       | `FSS2023`                                          |
-| `Authorization` | `Bearer {your_token}`                              |
-| `Content-Type`  | `application/json` or `multipart/form-data` for image uploads |
 
-<Note>
-  When including a `profile_image` file, set `Content-Type` to `multipart/form-data`. For text-only updates, use `application/json`.
-</Note>
 
-## Request body parameters
+## Headers
 
-All parameters are optional. Include only the fields you want to update.
-
-<ParamField body="name" type="string">
-  The user's full name.
+<ParamField header="X-API-Token" type="string" required>
+  Your API access token. You can also set this globally in the API playground.
 </ParamField>
 
-<ParamField body="first_name" type="string">
-  The user's first name.
+<ParamField header="platform" type="string" required>
+  The platform making the request: `WEB`, `IOS`, or `ANDROID`.
 </ParamField>
 
-<ParamField body="last_name" type="string">
-  The user's last name.
+<ParamField header="Authorization" type="string" required placeholder="Bearer {token}">
+  User authentication token (Bearer token received after signin).
+</ParamField>
+## Request Body
+
+<ParamField name="first_name" type="string" required={false}>
+  First name
 </ParamField>
 
-<ParamField body="phone" type="string">
-  The user's phone number.
+<ParamField name="last_name" type="string" required={false}>
+  Last name
 </ParamField>
 
-<ParamField body="country_code" type="string">
-  International dialing code, e.g. `"+1"`.
+<ParamField name="phone" type="string" required={false}>
+  Phone number
 </ParamField>
 
-<ParamField body="own_company_name" type="string">
-  Display name for the user's company.
+<ParamField name="email" type="string" required={false}>
+  Email address
 </ParamField>
 
-<ParamField body="email" type="string">
-  The user's email address.
-</ParamField>
-
-<ParamField body="profile_image" type="file">
-  A profile photo to upload. Send as `multipart/form-data`. Accepted formats: JPEG, PNG.
-</ParamField>
-
-<ParamField body="measurement_unit" type="string">
-  Preferred unit system. Accepted values: `"Imperial"`, `"Metric"`.
-</ParamField>
-
-## Response fields
+## Response
 
 <ResponseField name="status" type="string">
-  `"success"` on a successful update.
+  Success status
 </ResponseField>
 
 <ResponseField name="data" type="object">
-  The update result.
-
-  <Expandable title="data properties">
-    <ResponseField name="message" type="string">
-      A human-readable confirmation, e.g. `"Profile updated successfully"`.
-    </ResponseField>
-    <ResponseField name="user" type="object">
-      The updated user object.
-
-      <Expandable title="user properties">
-        <ResponseField name="id" type="integer">
-          Unique numeric identifier for the user.
-        </ResponseField>
-        <ResponseField name="first_name" type="string">
-          Updated first name.
-        </ResponseField>
-        <ResponseField name="last_name" type="string">
-          Updated last name.
-        </ResponseField>
-        <ResponseField name="email" type="string">
-          The user's email address.
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-  </Expandable>
+  Response data
 </ResponseField>
-
-## Example
 
 <RequestExample>
 
 ```bash cURL
-curl --request POST \
-  --url https://fssportal.com/api/v1/user/update_profile \
-  --header 'platform: WEB' \
-  --header 'api-key: FSS2023' \
-  --header 'Authorization: Bearer {your_token}' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "first_name": "Jane",
+curl -X POST http://localhost/fss/public/api/v1/user/update_profile \
+  -H "X-API-Token: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "John",
     "last_name": "Doe",
-    "phone": "5550001234",
-    "own_company_name": "Acme Blinds Co."
+    "phone": "1234567890"
   }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost/fss/public/api/v1/user/update_profile', {
+  method: 'POST',
+  headers: {
+    'X-API-Token': 'YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    first_name: 'John',
+    last_name: 'Doe',
+    phone: '1234567890'
+  })
+});
+
+const data = await response.json();
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json 200
+```json Success Response
 {
   "status": "success",
   "data": {
     "message": "Profile updated successfully",
     "user": {
-      "id": 68,
-      "first_name": "Jane",
+      "id": 1,
+      "first_name": "John",
       "last_name": "Doe",
-      "email": "user@example.com"
+      "email": "john@example.com"
     }
   }
 }
 ```
 
-```json 422
+```json Error Response
 {
   "status": "error",
   "message": "Validation failed"
